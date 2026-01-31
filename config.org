@@ -3023,7 +3023,7 @@ https://github.com/wasamasa/eyebrowse
 https://github.com/alphapapa/activities.el
 
 * Steam
-#+begin_src emacs-lisp :tangle pre-early-init.el
+#+begin_src emacs-lisp :tangle post-early-init.el
 (use-package steam
   :ensure t
   :defer t
