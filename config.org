@@ -41,7 +41,12 @@
 ;; Ensure adding the following compile-angel code at the very beginning
 ;; of your `~/.emacs.d/post-init.el` file, before all other packages.
 
-(async-bytecomp-package-mode 1)
+(use-package async
+  :ensure t
+  :init
+  ;; (setq async-bytecomp-allowed-packages '(all))
+  :config
+  (async-bytecomp-package-mode 1))
 
 (use-package compile-angel
   :ensure t
@@ -122,6 +127,7 @@
 
 * General Settings (Sane Defaults)
 #+begin_src emacs-lisp :tangle post-init.el
+(set 'epg-pinentry-mode 'loopback)
 (setq visible-bell nil)
 (setq inhibit-splash-screen t)
 (setq enable-recursive-minibuffers t)
@@ -202,32 +208,37 @@
 ;;   (add-hook mode-hook (lambda () (display-line-numbers-mode 0))))
 #+end_src
 
+* My MacOS Sane Defaults
+#+begin_src emacs-lisp :tangle post-init.el
+(setq mac-command-modifier 'meta)
+(setq frame-title-format "")
+#+end_src
+
 * TODO MELPA and others
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle post-init.el
 ;; (require 'package)
 
 ;; Add package archives
-;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-;; (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 
-;; (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
-;; (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t)
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
+(add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t)
 
 ;; Set the GPG program and home directory
 ;; (setq epg-gpg-program "gpg")
 ;; (setq epg-gpg-home-directory (expand-file-name "~/.gnupg"))
 
 ;; Temporarily disable signature checking to refresh package contents
-;; (let ((package-check-signature nil))
-;;   (package-refresh-contents))
-;; (unless package-archive-contents
-;;   (package-refresh-contents))
+(unless package-archive-contents
+  (let ((package-check-signature nil))
+    (package-refresh-contents)))
 
 ;; Re-enable signature checking after refreshing contents
 ;; (setq package-check-signature t)
 
 ;; Initialize package system
-;; (package-initialize)
+(package-initialize t)
 #+end_src
 
 * Utility Functions
@@ -276,16 +287,16 @@ at the values with which this function was called."
   (add-to-list 'default-frame-alist '(horizontal-scroll-bars))
   (add-to-list 'default-frame-alist '(vertical-scroll-bars))
   (add-to-list 'default-frame-alist '(internal-border-width . 20))
-  (add-to-list 'default-frame-alist '(font . "MonacoLigaturized Nerd Font-14"))
+  ;; (add-to-list 'default-frame-alist '(font . "MonacoLigaturized Nerd Font-14"))
   ;; (add-to-list 'default-frame-alist '(font . "FantasqueSansM Nerd Font-15"))
   ;; (add-to-list 'default-frame-alist '(alpha . 99))
   ;; (add-to-list 'default-frame-alist '(alphaBackground . 50))
   ;; (add-to-list 'default-frame-alist '(undecorated . t))
   ;; (add-to-list 'default-frame-alist '(fullscreen . fullboth))
+  ;; (add-to-list 'default-frame-alist '(width . 168)) ; was 166
+  ;; (add-to-list 'default-frame-alist '(height . (text-pixels . 1400)))
   (add-to-list 'default-frame-alist '(left-fringe . 10))
-  (add-to-list 'default-frame-alist '(right-fringe . 10))
-  (add-to-list 'default-frame-alist '(width . 168)) ; was 166
-  (add-to-list 'default-frame-alist '(height . (text-pixels . 1400))))
+  (add-to-list 'default-frame-alist '(right-fringe . 10)))
 
 (ey/add-stuff-to-default-buffer-alist)
 
@@ -295,9 +306,9 @@ at the values with which this function was called."
 ;;     (set-lovely-fonts)))
 
 (when (daemonp)
-    (add-hook 'server-after-make-frame-hook #'ey/add-stuff-to-default-buffer-alist)
-    ;; (add-hook 'after-make-frame-functions #'ey/apply-custom-behav-to-client)
-    )
+  (add-hook 'server-after-make-frame-hook #'ey/add-stuff-to-default-buffer-alist)
+  ;; (add-hook 'after-make-frame-functions #'ey/apply-custom-behav-to-client)
+  )
 #+end_src
 
 * Evil Mode
@@ -308,6 +319,7 @@ at the values with which this function was called."
   :demand t
   :hook (after-init . evil-mode)
   :init
+  (defvar evil-mode-buffers '()) ; temp fix for https://github.com/emacs-evil/evil/issues/1983
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
   (setq evil-jumps-cross-buffers nil)
@@ -424,12 +436,7 @@ at the values with which this function was called."
         corfu-auto-delay 0.24
         corfu-auto-prefix 2
         global-corfu-modes
-        '((not erc-mode
-               circe-mode
-               help-mode
-               gud-mode
-               vterm-mode)
-          t)
+        '((not erc-mode circe-mode help-mode gud-mode vterm-mode) t)
         ;; tab-always-indent 'complete
         corfu-cycle t
         corfu-preview-current nil
@@ -669,17 +676,17 @@ at the values with which this function was called."
 * General Prefixes after the 'Main Prefix'
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys                ; prefix keys (for `which-key-mode')
-  "o" '(:which-key "open"          :ignore t)
-  "f" '(:which-key "file"          :ignore t)
-  "p" '(:which-key "project"       :ignore t)
-  "i" '(:which-key "insert"        :ignore t)
-  "s" '(:which-key "search"        :ignore t)
-  "t" '(:which-key "toggle"        :ignore t)
-  "v" '(:which-key "tab-bar"       :ignore t)
-  "g" '(:which-key "vc"            :ignore t)
-  "w" '(:which-key "window-select" :ignore t)
-  "m" '(:which-key "localleader"   :ignore t)
-  "h" '(:which-key "help"          :ignore t))
+ "o" '(:which-key "open"          :ignore t)
+ "f" '(:which-key "file"          :ignore t)
+ "p" '(:which-key "project"       :ignore t)
+ "i" '(:which-key "insert"        :ignore t)
+ "s" '(:which-key "search"        :ignore t)
+ "t" '(:which-key "toggle"        :ignore t)
+ "v" '(:which-key "tab-bar"       :ignore t)
+ "g" '(:which-key "vc"            :ignore t)
+ "w" '(:which-key "window-select" :ignore t)
+ "m" '(:which-key "localleader"   :ignore t)
+ "h" '(:which-key "help"          :ignore t))
 #+end_src
 
 * Helpful
@@ -962,10 +969,11 @@ of the fringe.  When the fringe is hidden, this value is also used."
 * Font Face
 #+begin_src emacs-lisp :tangle post-init.el
 (defun set-lovely-fonts ()
-  (set-face-attribute 'default nil
-                      :font "FantasqueSansM Nerd Font"
-                      ;; :height 160
-                      :weight 'normal)
+  (interactive)
+  ;; (set-face-attribute 'default nil
+  ;;                     :font "Monaco"
+  ;;                     ;; :height 160
+  ;;                     :weight 'normal)
   ;; (set-face-attribute 'variable-pitch nil
   ;;                     :font "FantasqueSansM Nerd Font"
   ;;                     :height 160
@@ -986,7 +994,7 @@ of the fringe.  When the fringe is hidden, this value is also used."
   (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
   (set-face-attribute 'font-lock-keyword-face nil :slant 'italic))
 
-;; (set-lovely-fonts)
+;; (set-lovely-fonts) ; don't set lovely fonts for now
 
 ;; Uncomment the following line if line spacing needs adjusting.
 (setq-default line-spacing nil)     ; 0.12
@@ -1013,7 +1021,8 @@ of the fringe.  When the fringe is hidden, this value is also used."
 
 (use-package hide-mode-line
   :defer t
-  :init (global-hide-mode-line-mode 1))
+  ;; :init (global-hide-mode-line-mode 1)
+  )
 #+end_src
 
 * AutoRevert
@@ -1087,12 +1096,12 @@ of the fringe.  When the fringe is hidden, this value is also used."
 #+begin_src emacs-lisp
 (defvar prot-vertico-multiform-minimal
   '(unobtrusive
-    (vertico-flat-format . ( :multiple  ""
-                             :single    ""
-                             :prompt    ""
-                             :separator ""
-                             :ellipsis  ""
-                             :no-match  ""))
+    (vertico-flat-format . (:multiple  ""
+                            :single    ""
+                            :prompt    ""
+                            :separator ""
+                            :ellipsis  ""
+                            :no-match  ""))
     (vertico-preselect . prompt))
   "List of configurations for minimal Vertico multiform.
 The minimal view is intended to be more private or less
@@ -1180,23 +1189,23 @@ Else do `vertico-exit'."
   :ensure nil
   :demand t
   :bind
-  ( :map vertico-map
-    ("<left>" . backward-char)
-    ("<right>" . forward-char)
-    ("TAB" . prot-vertico-private-complete) ; `vertico-insert'
-    ("<tab>" . prot-vertico-private-complete) ; `vertico-insert'
-    ("DEL" . vertico-directory-delete-char)
-    ("M-DEL" . vertico-directory-delete-word)
-    ("M-," . vertico-quick-insert)
-    ("M-." . vertico-quick-exit)
-    :map vertico-multiform-map
-    ("RET" . prot-vertico-private-exit)
-    ("<return>" . prot-vertico-private-exit)
-    ("C-n" . prot-vertico-private-next)
-    ("<down>" . prot-vertico-private-next)
-    ("C-p" . prot-vertico-private-previous)
-    ("<up>" . prot-vertico-private-previous)
-    ("C-l" . vertico-multiform-vertical))
+  (:map vertico-map
+   ("<left>" . backward-char)
+   ("<right>" . forward-char)
+   ("TAB" . prot-vertico-private-complete) ; `vertico-insert'
+   ("<tab>" . prot-vertico-private-complete) ; `vertico-insert'
+   ("DEL" . vertico-directory-delete-char)
+   ("M-DEL" . vertico-directory-delete-word)
+   ("M-," . vertico-quick-insert)
+   ("M-." . vertico-quick-exit)
+   :map vertico-multiform-map
+   ("RET" . prot-vertico-private-exit)
+   ("<return>" . prot-vertico-private-exit)
+   ("C-n" . prot-vertico-private-next)
+   ("<down>" . prot-vertico-private-next)
+   ("C-p" . prot-vertico-private-previous)
+   ("<up>" . prot-vertico-private-previous)
+   ("C-l" . vertico-multiform-vertical))
   :config
   (setq vertico-multiform-commands
         `(("consult-\\(.*\\)?\\(find\\|grep\\|ripgrep\\)" ,@prot-vertico-multiform-maximal)))
@@ -1305,7 +1314,7 @@ Else do `vertico-exit'."
 (use-package ef-themes
   :config
   (setq ef-themes-mixed-fonts nil
-	    ef-themes-variable-pitch-ui nil))
+	ef-themes-variable-pitch-ui nil))
 #+end_src
 
 * Extra Themes
@@ -1342,7 +1351,7 @@ Else do `vertico-exit'."
 
 * Set Theme
 #+begin_src emacs-lisp :tangle post-init.el
-(consult-theme 'doom-tomorrow-night)
+(load-theme 'doom-tomorrow-night t)
 ;; (load-theme 'doom-one t)
 ;; (load-theme 'ef-summer :no-confirm)
 ;; (load-theme 'ef-owl :no-confirm)
@@ -1483,7 +1492,7 @@ Else do `vertico-exit'."
   :defer t)
 
 (define-leader-keys
-  "s E" '(consult-everything :wk "Search Everything"))
+ "s E" '(consult-everything :wk "Search Everything"))
 #+end_src
 
 * Dumb Jump
@@ -1602,26 +1611,26 @@ Else do `vertico-exit'."
     (tab-bar-switch-to-tab (cdr (cadr (tab-bar--current-tab-find)))))
 
   (define-leader-keys
-    "v"           '(                           :wk "tab-bar" :ignore t)
-    "v ."         '(tab-bar-select-tab-by-name :wk "select tab by name")
-    "v v"         '(+tab-bar-show-tabs         :wk "show tabs")
-    "v N"         '(+tab-bar-new-named-tab     :wk "new named tab")
-    "v n"         '(tab-bar-new-tab            :wk "new tab")
-    "v r"         '(tab-bar-rename-tab         :wk "rename tab")
-    "v d"         '(tab-bar-close-tab          :wk "close tab")
-    "v S-<right>" '(tab-bar-move-tab           :wk "move tab right")
-    "v S-<left>"  '(tab-bar-move-tab-backward  :wk "move tab left"))
+   "v"           '(                           :wk "tab-bar" :ignore t)
+   "v ."         '(tab-bar-select-tab-by-name :wk "select tab by name")
+   "v v"         '(+tab-bar-show-tabs         :wk "show tabs")
+   "v N"         '(+tab-bar-new-named-tab     :wk "new named tab")
+   "v n"         '(tab-bar-new-tab            :wk "new tab")
+   "v r"         '(tab-bar-rename-tab         :wk "rename tab")
+   "v d"         '(tab-bar-close-tab          :wk "close tab")
+   "v S-<right>" '(tab-bar-move-tab           :wk "move tab right")
+   "v S-<left>"  '(tab-bar-move-tab-backward  :wk "move tab left"))
 
   (define-leader-keys
-    "TAB"           '(                           :wk "tab-bar" :ignore t)
-    "TAB ."         '(tab-bar-select-tab-by-name :wk "select tab by name")
-    "TAB TAB"       '(+tab-bar-show-tabs         :wk "show tabs")
-    "TAB N"         '(+tab-bar-new-named-tab     :wk "new named tab")
-    "TAB n"         '(tab-bar-new-tab            :wk "new tab")
-    "TAB r"         '(tab-bar-rename-tab         :wk "rename tab")
-    "TAB d"         '(tab-bar-close-tab          :wk "close tab")
-    "TAB S-<right>" '(tab-bar-move-tab           :wk "move tab right")
-    "TAB S-<left>"  '(tab-bar-move-tab-backward  :wk "move tab left")))
+   "TAB"           '(                           :wk "tab-bar" :ignore t)
+   "TAB ."         '(tab-bar-select-tab-by-name :wk "select tab by name")
+   "TAB TAB"       '(+tab-bar-show-tabs         :wk "show tabs")
+   "TAB N"         '(+tab-bar-new-named-tab     :wk "new named tab")
+   "TAB n"         '(tab-bar-new-tab            :wk "new tab")
+   "TAB r"         '(tab-bar-rename-tab         :wk "rename tab")
+   "TAB d"         '(tab-bar-close-tab          :wk "close tab")
+   "TAB S-<right>" '(tab-bar-move-tab           :wk "move tab right")
+   "TAB S-<left>"  '(tab-bar-move-tab-backward  :wk "move tab left")))
 
 (use-package tab-bar-echo-area
   :ensure t
@@ -1744,22 +1753,21 @@ Else do `vertico-exit'."
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package doom-snippets
   :defer nil
-  :load-path "~/.emacs.d/doom-snippets"
+  :vc (:url "https://github.com/doomemacs/snippets")
+  ;; :load-path (expand-file-name "doom-snippets/" minimal-emacs-var-dir)
   :after yasnippet
-  ;; :config
-  ;; (setq yas-snippet-dirs '("c:/Users/Eyu/.emacs.d/doom-snippets"
-  ;;                          "c:/Users/Eyu/Projects/probe/minimal-emacs.d/var/snippets"))
-  )
+  :preface
+  (setq doom-snippets-dir (expand-file-name "doom-snippets/" package-user-dir)))
 #+end_src
 
 * Custom Functions
 ** Set Jump
 #+begin_src emacs-lisp :tangle post-init.el
 (defun doom-set-jump-a (fn &rest args)
-    "Set a jump point and ensure fn doesn't set any new jump points."
-    (evil-set-jump (if (markerp (car args)) (car args)))
-    (let ((evil--jumps-jumping t))
-      (apply fn args)))
+  "Set a jump point and ensure fn doesn't set any new jump points."
+  (evil-set-jump (if (markerp (car args)) (car args)))
+  (let ((evil--jumps-jumping t))
+    (apply fn args)))
 
 (advice-add '+default/search-buffer :around #'doom-set-jump-a)
 (advice-add 'consult-imenu :around #'doom-set-jump-a)
@@ -2079,15 +2087,15 @@ Use in `isearch-mode-end-hook'."
   "Return value of lang for the current block if in block body and nil otherwise."
   (let ((element (save-match-data (org-element-at-point))))
     (and (eq (org-element-type element) 'src-block)
-	     (>= (line-beginning-position)
-	         (org-element-property :post-affiliated element))
-	     (<=
-	      (line-end-position)
-	      (org-with-wide-buffer
-	       (goto-char (org-element-property :end element))
-	       (skip-chars-backward " \t\n")
-	       (line-end-position)))
-	     (org-element-property :language element))))
+	 (>= (line-beginning-position)
+	     (org-element-property :post-affiliated element))
+	 (<=
+	  (line-end-position)
+	  (org-with-wide-buffer
+	   (goto-char (org-element-property :end element))
+	   (skip-chars-backward " \t\n")
+	   (line-end-position)))
+	 (org-element-property :language element))))
 
 (defun +org-yas-expand-maybe-h ()
   "Expand a yasnippet snippet, if trigger exists at point or region is active.
@@ -2275,11 +2283,11 @@ re-align the table if necessary. (Necessary because org-mode has a
       ;; necessary.
       (_
        (let ((level (or (org-current-level) 1)))
-	     ;; I intentionally avoid `org-insert-heading' and the like because they
-	     ;; impose unpredictable whitespace rules depending on the cursor
-	     ;; position. It's simpler to express this command's responsibility at a
-	     ;; lower level than work around all the quirks in org's API.
-	     (pcase direction
+	 ;; I intentionally avoid `org-insert-heading' and the like because they
+	 ;; impose unpredictable whitespace rules depending on the cursor
+	 ;; position. It's simpler to express this command's responsibility at a
+	 ;; lower level than work around all the quirks in org's API.
+	 (pcase direction
            (`below
             (let (org-insert-heading-respect-content)
               (goto-char (line-end-position))
@@ -2289,8 +2297,8 @@ re-align the table if necessary. (Necessary because org-mode has a
             (org-back-to-heading)
             (insert (make-string level ?*) " ")
             (save-excursion (insert "\n"))))
-	     (run-hooks 'org-insert-heading-hook)
-	     (when-let* ((todo-keyword (org-element-property :todo-keyword context))
+	 (run-hooks 'org-insert-heading-hook)
+	 (when-let* ((todo-keyword (org-element-property :todo-keyword context))
                      (todo-type    (org-element-property :todo-type context)))
            (org-todo
             (cond ((eq todo-type 'done)
@@ -3144,14 +3152,15 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
   :config
   (setq spacious-padding-widths
         '(:internal-border-width 20
-                                 :mode-line-width 6
-                                 :header-line-width 4
-                                 :tab-width 4
-                                 :right-divider-width 17
-                                 :fringe-width 10))
-  ;; (setq spacious-padding-subtle-mode-line
-  ;;       '(:mode-line-active shadow :mode-line-inactive shadow))
-  (setq spacious-padding-subtle-mode-line nil))
+          :mode-line-width 6
+          :header-line-width 4
+          :tab-width 4
+          :right-divider-width 17
+          :fringe-width 10))
+  (setq spacious-padding-subtle-mode-line
+        '(:mode-line-active shadow :mode-line-inactive shadow))
+  ;; (setq spacious-padding-subtle-mode-line nil)
+  )
 #+end_src
 
 * Inhibit Mouse Mode
@@ -3213,9 +3222,9 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
         (yaml       "https://github.com/ikatyang/tree-sitter-yaml")))
 (setq treesit-font-lock-level 3)
 (setq-default forward-sexp-function 'forward-sexp-default-function)
-(use-package treesit-auto
-  :demand t
-  :config (global-treesit-auto-mode))
+;; (use-package treesit-auto ; FIXME: checking for treesit language for file takes a long time
+;;   :demand t
+;;   :config (global-treesit-auto-mode))
 #+end_src
 
 * Prog Modes
@@ -3527,16 +3536,16 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
     ))
 
 (define-leader-keys
-  "o A"   'org-agenda)
+ "o A"   'org-agenda)
 
 (with-eval-after-load 'org
   (define-leader-keys
-    :keymaps 'org-mode-map
-    "m t"   '(org-todo                    :which-key "org-todo")
-    "m ."   '(consult-org-heading         :which-key "consult-org-heading")
-    "m /"   '(consult-org-agenda          :which-key "consult-org-agenda")
-    "m s r" '(org-refile                  :which-key "consult-org-agenda")
-    "m h"   '(org-toggle-heading          :which-key "org-toggle-heading")))
+   :keymaps 'org-mode-map
+   "m t"   '(org-todo                    :which-key "org-todo")
+   "m ."   '(consult-org-heading         :which-key "consult-org-heading")
+   "m /"   '(consult-org-agenda          :which-key "consult-org-agenda")
+   "m s r" '(org-refile                  :which-key "consult-org-agenda")
+   "m h"   '(org-toggle-heading          :which-key "org-toggle-heading")))
 #+end_src
 
 ** Eldoc Mappings
@@ -3548,15 +3557,15 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 ** Help Keymaps
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
-  "h v" '(describe-variable :which-key "describe-variable")
-  "h f" '(describe-function :which-key "describe-function")
-  "h k" '(describe-key      :which-key "describe-key")
-  "h F" '(describe-face     :which-key "describe-face")
-  "h p" '(describe-package  :which-key "describe-package")
-  "h o" '(describe-symbol   :which-key "describe-symbol")
-  "h l" '(view-lossage      :which-key "view-lossage")
-  "h i" '(info              :which-key "describe-info")
-  "h m" '(describe-mode     :which-key "describe-mode"))
+ "h v" '(describe-variable :which-key "describe-variable")
+ "h f" '(describe-function :which-key "describe-function")
+ "h k" '(describe-key      :which-key "describe-key")
+ "h F" '(describe-face     :which-key "describe-face")
+ "h p" '(describe-package  :which-key "describe-package")
+ "h o" '(describe-symbol   :which-key "describe-symbol")
+ "h l" '(view-lossage      :which-key "view-lossage")
+ "h i" '(info              :which-key "describe-info")
+ "h m" '(describe-mode     :which-key "describe-mode"))
 #+end_src
 
 ** Bookmarks
@@ -3567,90 +3576,90 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 ** Project Bindings
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
-  "/"   '(ey/consult-search-project       :which-key "project-consult-ripgrep")
-  "SPC" '(project-find-file               :which-key "project-find-file")
-  "p p" '(project-switch-project          :which-key "project-switch-project")
-  "p t" '(magit-todos-list                :which-key "List project todos")
-  "p d" '(project-forget-project          :which-key "project-forget-project")
-  "p b" '(consult-project-buffer          :which-key "consult-project-buffer")
-  "p c" '(project-compile                 :which-key "project-compile")
-  "p f" '(project-find-file               :which-key "project-find-file")
-  "p F" '(project-or-external-find-file   :which-key "project-or-external-find-file")
-  "p s" '(project-find-regexp             :which-key "project-find-regexp")
-  "p S" '(project-or-external-find-regexp :which-key "project-or-external-find-regexp")
-  "p l" '(project-list-buffers            :which-key "project-list-buffers")
-  "p R" '(project-query-replace-regexp    :which-key "project-query-replace-regexp")
-  "p k" '(project-kill-buffers            :which-key "project-kill-buffers"))
+ "/"   '(ey/consult-search-project       :which-key "project-consult-ripgrep")
+ "SPC" '(project-find-file               :which-key "project-find-file")
+ "p p" '(project-switch-project          :which-key "project-switch-project")
+ "p t" '(magit-todos-list                :which-key "List project todos")
+ "p d" '(project-forget-project          :which-key "project-forget-project")
+ "p b" '(consult-project-buffer          :which-key "consult-project-buffer")
+ "p c" '(project-compile                 :which-key "project-compile")
+ "p f" '(project-find-file               :which-key "project-find-file")
+ "p F" '(project-or-external-find-file   :which-key "project-or-external-find-file")
+ "p s" '(project-find-regexp             :which-key "project-find-regexp")
+ "p S" '(project-or-external-find-regexp :which-key "project-or-external-find-regexp")
+ "p l" '(project-list-buffers            :which-key "project-list-buffers")
+ "p R" '(project-query-replace-regexp    :which-key "project-query-replace-regexp")
+ "p k" '(project-kill-buffers            :which-key "project-kill-buffers"))
 #+end_src
 
 ** TODO Unimpaired style maps
 #+begin_src emacs-lisp
-      (:when (modulep! :checkers spell)
-       :n  "zg"   #'+spell/add-word
-       :n  "zw"   #'+spell/remove-word
-       :m  "[s"   #'+spell/previous-error
-       :m  "]s"   #'+spell/next-error)
+(:when (modulep! :checkers spell)
+  :n  "zg"   #'+spell/add-word
+  :n  "zw"   #'+spell/remove-word
+  :m  "[s"   #'+spell/previous-error
+  :m  "]s"   #'+spell/next-error)
 
-      ;; ported from vim-unimpaired
-      :n  "] SPC" #'+evil/insert-newline-below
-      :n  "[ SPC" #'+evil/insert-newline-above
-      :n  "]b"    #'next-buffer
-      :n  "[b"    #'previous-buffer
-      :n  "]f"    #'+evil/next-file
-      :n  "[f"    #'+evil/previous-file
-      :m  "]u"    #'+evil:url-encode
-      :m  "[u"    #'+evil:url-decode
-      :m  "]y"    #'+evil:c-string-encode
-      :m  "[y"    #'+evil:c-string-decode
-      (:when (modulep! :lang web)
-       :m "]x"   #'+web:encode-html-entities
-       :m "[x"   #'+web:decode-html-entities)
-      (:when (modulep! :ui vc-gutter)
-       :m "]d"   #'+vc-gutter/next-hunk
-       :m "[d"   #'+vc-gutter/previous-hunk)
-      (:when (modulep! :ui hl-todo)
-       :m "]t"   #'hl-todo-next
-       :m "[t"   #'hl-todo-previous)
-      (:when (modulep! :ui workspaces)
-       :n "gt"   #'+workspace:switch-next
-       :n "gT"   #'+workspace:switch-previous
-       :n "]w"   #'+workspace/switch-right
-       :n "[w"   #'+workspace/switch-left)
-      (:when (modulep! :ui tabs)
-       :n "gt"   #'+tabs:next-or-goto
-       :n "gT"   #'+tabs:previous-or-goto)
+;; ported from vim-unimpaired
+:n  "] SPC" #'+evil/insert-newline-below
+:n  "[ SPC" #'+evil/insert-newline-above
+:n  "]b"    #'next-buffer
+:n  "[b"    #'previous-buffer
+:n  "]f"    #'+evil/next-file
+:n  "[f"    #'+evil/previous-file
+:m  "]u"    #'+evil:url-encode
+:m  "[u"    #'+evil:url-decode
+:m  "]y"    #'+evil:c-string-encode
+:m  "[y"    #'+evil:c-string-decode
+(:when (modulep! :lang web)
+  :m "]x"   #'+web:encode-html-entities
+  :m "[x"   #'+web:decode-html-entities)
+(:when (modulep! :ui vc-gutter)
+  :m "]d"   #'+vc-gutter/next-hunk
+  :m "[d"   #'+vc-gutter/previous-hunk)
+(:when (modulep! :ui hl-todo)
+  :m "]t"   #'hl-todo-next
+  :m "[t"   #'hl-todo-previous)
+(:when (modulep! :ui workspaces)
+  :n "gt"   #'+workspace:switch-next
+  :n "gT"   #'+workspace:switch-previous
+  :n "]w"   #'+workspace/switch-right
+  :n "[w"   #'+workspace/switch-left)
+(:when (modulep! :ui tabs)
+  :n "gt"   #'+tabs:next-or-goto
+  :n "gT"   #'+tabs:previous-or-goto)
 
-      ;; custom vim-unmpaired-esque keys
-      :m  "]#"    #'+evil/next-preproc-directive
-      :m  "[#"    #'+evil/previous-preproc-directive
-      :m  "]a"    #'evil-forward-arg
-      :m  "[a"    #'evil-backward-arg
-      :m  "]c"    #'+evil/next-comment
-      :m  "[c"    #'+evil/previous-comment
-      :m  "]e"    #'next-error
-      :m  "[e"    #'previous-error
-      :n  "]F"    #'+evil/next-frame
-      :n  "[F"    #'+evil/previous-frame
-      :m  "]h"    #'outline-next-visible-heading
-      :m  "[h"    #'outline-previous-visible-heading
-      :m  "]m"    #'+evil/next-beginning-of-method
-      :m  "[m"    #'+evil/previous-beginning-of-method
-      :m  "]M"    #'+evil/next-end-of-method
-      :m  "[M"    #'+evil/previous-end-of-method
-      :n  "[o"    #'+evil/insert-newline-above
-      :n  "]o"    #'+evil/insert-newline-below
-      :n  "gp"    #'+evil/reselect-paste
-      :v  "gp"    #'+evil/alt-paste
-      :nv "g@"    #'+evil:apply-macro
-      :nv "gc"    #'evilnc-comment-operator
-      :nv "gO"    #'imenu
-      :nv "gx"    #'evil-exchange
-      :nv "gy"    #'+evil:yank-unindented
-      :n  "g="    #'evil-numbers/inc-at-pt
-      :n  "g-"    #'evil-numbers/dec-at-pt
-      :v  "g="    #'evil-numbers/inc-at-pt-incremental
-      :v  "g-"    #'evil-numbers/dec-at-pt-incremental
-      :v  "g+"    #'evil-numbers/inc-at-pt
+;; custom vim-unmpaired-esque keys
+:m  "]#"    #'+evil/next-preproc-directive
+:m  "[#"    #'+evil/previous-preproc-directive
+:m  "]a"    #'evil-forward-arg
+:m  "[a"    #'evil-backward-arg
+:m  "]c"    #'+evil/next-comment
+:m  "[c"    #'+evil/previous-comment
+:m  "]e"    #'next-error
+:m  "[e"    #'previous-error
+:n  "]F"    #'+evil/next-frame
+:n  "[F"    #'+evil/previous-frame
+:m  "]h"    #'outline-next-visible-heading
+:m  "[h"    #'outline-previous-visible-heading
+:m  "]m"    #'+evil/next-beginning-of-method
+:m  "[m"    #'+evil/previous-beginning-of-method
+:m  "]M"    #'+evil/next-end-of-method
+:m  "[M"    #'+evil/previous-end-of-method
+:n  "[o"    #'+evil/insert-newline-above
+:n  "]o"    #'+evil/insert-newline-below
+:n  "gp"    #'+evil/reselect-paste
+:v  "gp"    #'+evil/alt-paste
+:nv "g@"    #'+evil:apply-macro
+:nv "gc"    #'evilnc-comment-operator
+:nv "gO"    #'imenu
+:nv "gx"    #'evil-exchange
+:nv "gy"    #'+evil:yank-unindented
+:n  "g="    #'evil-numbers/inc-at-pt
+:n  "g-"    #'evil-numbers/dec-at-pt
+:v  "g="    #'evil-numbers/inc-at-pt-incremental
+:v  "g-"    #'evil-numbers/dec-at-pt-incremental
+:v  "g+"    #'evil-numbers/inc-at-pt
 #+end_src
 
 ** General Bindings
@@ -3688,9 +3697,9 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 ** File Bindings
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
-  "f D" '(bufferfile-delete :which-key "bufferfile-delete")
-  "f C" '(bufferfile-copy   :which-key "bufferfile-copy")
-  "f R" '(bufferfile-rename :which-key "bufferfile-rename"))
+ "f D" '(bufferfile-delete :which-key "bufferfile-delete")
+ "f C" '(bufferfile-copy   :which-key "bufferfile-copy")
+ "f R" '(bufferfile-rename :which-key "bufferfile-rename"))
 #+end_src
 
 ** Magit Bindings
@@ -3716,7 +3725,7 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 ** Vertico Mappings
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
-  "'" '(vertico-repeat-select  :which-key "vertico search history"))
+ "'" '(vertico-repeat-select  :which-key "vertico search history"))
 (with-eval-after-load 'vertico
   (define-key vertico-map (kbd "C-SPC") '+vertico/embark-preview)
   ;; (define-key vertico-map (kbd "DEL")   'vertico-directory-delete-char)
@@ -3733,23 +3742,23 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 ** Consult Mappings
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
-  "h t" '(consult-theme               :which-key "consult-theme")
-  "hdd" '(toggle-debug-on-error       :which-key "debug-mode")
-  "s r" '(consult-mark                :which-key "consult-mark")
-  "i r" '(consult-register            :which-key "consult-register")
-  "f r" '(consult-recent-file         :which-key "consult-recent-file")
-  "i s" '(consult-yasnippet           :which-key "consult-yasnippet")
-  "i y" '(consult-yank-from-kill-ring :which-key "consult-yank-from-kill-ring")
-  "s i" '(consult-imenu               :which-key "consult-imenu")
-  "s f" '(consult-locate              :which-key "consult-locate")
-  "RET" '(consult-bookmark            :which-key "consult-bookmark"))
+ "h t" '(consult-theme               :which-key "consult-theme")
+ "hdd" '(toggle-debug-on-error       :which-key "debug-mode")
+ "s r" '(consult-mark                :which-key "consult-mark")
+ "i r" '(consult-register            :which-key "consult-register")
+ "f r" '(consult-recent-file         :which-key "consult-recent-file")
+ "i s" '(consult-yasnippet           :which-key "consult-yasnippet")
+ "i y" '(consult-yank-from-kill-ring :which-key "consult-yank-from-kill-ring")
+ "s i" '(consult-imenu               :which-key "consult-imenu")
+ "s f" '(consult-locate              :which-key "consult-locate")
+ "RET" '(consult-bookmark            :which-key "consult-bookmark"))
 #+end_src
 
 ** Insert Bindings
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
-  "i n" '(nerd-icons-insert    :which-key "insert nerd icon")
-  "i e" '(emojify-insert-emoji :which-key "insert unicode emoji"))
+ "i n" '(nerd-icons-insert    :which-key "insert nerd icon")
+ "i e" '(emojify-insert-emoji :which-key "insert unicode emoji"))
 #+end_src
 
 ** ToDo Keybindings
@@ -3764,8 +3773,8 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
-  "o x" 'devdocs-lookup
-  "o X" 'devdocs-lookup-all)
+ "o x" 'devdocs-lookup
+ "o X" 'devdocs-lookup-all)
 #+end_src
 
 ** Custom Additional Bindings
@@ -3785,19 +3794,19 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
   (evil-define-key 'operator               global-map (kbd "<down>")  'evil-next-line))
 
 (define-leader-keys
-  "s s" '(+default/search-buffer                    :which-key "+default/search-buffer")
-  "s m" '(ey/show-doom-modeline-in-echo-area        :which-key "show modeline")
-  "s M" '(global-hide-mode-line-mode                :which-key "toggle modeline visibility")
-  "f o" '(ey/find-file-under-selection-other-window :which-key "ey/find-file-under-selection")
-  "r g" '(ey/consult-ripgrep-cwd                    :which-key "ey/consult-ripgrep-cwd")
-  "f d" '(ey/consult-fd-or-find                     :which-key "ey/consult-fd-or-find"))
+ "s s" '(+default/search-buffer                    :which-key "+default/search-buffer")
+ "s m" '(ey/show-doom-modeline-in-echo-area        :which-key "show modeline")
+ "s M" '(global-hide-mode-line-mode                :which-key "toggle modeline visibility")
+ "f o" '(ey/find-file-under-selection-other-window :which-key "ey/find-file-under-selection")
+ "r g" '(ey/consult-ripgrep-cwd                    :which-key "ey/consult-ripgrep-cwd")
+ "f d" '(ey/consult-fd-or-find                     :which-key "ey/consult-fd-or-find"))
 #+end_src
 
 ** Eshell Bindings
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
-  "o e" '(eshell         :which-key "eshell")
-  "o E" '(project-eshell :which-key "project eshell"))
+ "o e" '(eshell         :which-key "eshell")
+ "o E" '(project-eshell :which-key "project eshell"))
 #+end_src
 
 ** Isearch visual windows
@@ -3812,24 +3821,24 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 ** Buffer Keybinds
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
-  ;; :keymaps 'dired-mode-map
-  "b"     '(                                   :which-key "buffer" :ignore t)
-  "b i"   '(ibuffer                            :which-key "Ibuffer")
-  "b o"   '(:ignore t                          :which-key "Buffer other window")
-  "b o i" '(ibuffer-other-window               :which-key "Ibuffer other window")
-  "b c"   '(clone-indirect-buffer-other-window :which-key "Clone indirect buffer other window")
-  "b k"   '(kill-current-buffer                :which-key "Kill current buffer")
-  "b K"   '(kill-buffer-and-window             :which-key "Kill current buffer and window")
-  "b n"   '(next-buffer                        :which-key "Next buffer")
-  "b N"   '(evil-buffer-new                    :which-key "New buffer")
-  "b p"   '(previous-buffer                    :which-key "Previous buffer")
-  ;; "b b"   '(consult-project-buffer             :which-key "List project buffers")
-  ;; ","     '(consult-project-buffer             :which-key "List project buffers")
-  "b b"   '(consult-buffer                     :which-key "List buffers")
-  ","     '(consult-buffer                     :which-key "List buffers")
-  "<"     '(consult-buffer                     :which-key "List all buffers")
-  "b B"   '(consult-buffer                     :which-key "List all buffers")
-  "b r"   '(revert-buffer                      :which-key "Revert buffer"))
+ ;; :keymaps 'dired-mode-map
+ "b"     '(                                   :which-key "buffer" :ignore t)
+ "b i"   '(ibuffer                            :which-key "Ibuffer")
+ "b o"   '(:ignore t                          :which-key "Buffer other window")
+ "b o i" '(ibuffer-other-window               :which-key "Ibuffer other window")
+ "b c"   '(clone-indirect-buffer-other-window :which-key "Clone indirect buffer other window")
+ "b k"   '(kill-current-buffer                :which-key "Kill current buffer")
+ "b K"   '(kill-buffer-and-window             :which-key "Kill current buffer and window")
+ "b n"   '(next-buffer                        :which-key "Next buffer")
+ "b N"   '(evil-buffer-new                    :which-key "New buffer")
+ "b p"   '(previous-buffer                    :which-key "Previous buffer")
+ ;; "b b"   '(consult-project-buffer             :which-key "List project buffers")
+ ;; ","     '(consult-project-buffer             :which-key "List project buffers")
+ "b b"   '(consult-buffer                     :which-key "List buffers")
+ ","     '(consult-buffer                     :which-key "List buffers")
+ "<"     '(consult-buffer                     :which-key "List all buffers")
+ "b B"   '(consult-buffer                     :which-key "List all buffers")
+ "b r"   '(revert-buffer                      :which-key "Revert buffer"))
 #+end_src
 
 ** Corfu Bindings
@@ -3847,64 +3856,64 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 ** Embark Mappings
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
-  "a"     '(embark-act      :which-key "embark-act")
-  "h b b" '(embark-bindings :which-key "embark-bindings"))
+ "a"     '(embark-act      :which-key "embark-act")
+ "h b b" '(embark-bindings :which-key "embark-bindings"))
 #+end_src
 
 ** Window Control
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
-  "w"           '(                            :which-key "window-select" :ignore t)
-  "w <up>"      '(evil-window-up              :which-key "evil window up")
-  "<up>"        '(evil-window-up              :which-key "evil window up")
-  "w <down>"    '(evil-window-down            :which-key "evil window down")
-  "<down>"      '(evil-window-down            :which-key "evil window down")
-  "w <left>"    '(evil-window-left            :which-key "evil window left")
-  "<left>"      '(evil-window-left            :which-key "evil window left")
-  "w <right>"   '(evil-window-right           :which-key "evil window right")
-  "<right>"     '(evil-window-right           :which-key "evil window right")
-  "w S-<up>"    '(+evil/window-move-up        :which-key "evil window move up")
-  "w S-<down>"  '(+evil/window-move-down      :which-key "evil window move down")
-  "w S-<left>"  '(+evil/window-move-left      :which-key "evil window move left")
-  "w S-<right>" '(+evil/window-move-right     :which-key "evil window move right")
-  "w w"         '(evil-window-next            :which-key "next window")
-  "w u"         '(winner-undo                 :which-key "winner undo")
-  "w r"         '(winner-redo                 :which-key "winner redo")
-  "w M"         '(delete-other-windows        :which-key "close other windows")
-  "w e"         '(delete-other-windows        :which-key "close other windows")
-  "w q"         '(evil-quit                   :which-key "close evil window")
-  "w n"         '(evil-window-new             :which-key "new window")
-  "w p"         '(evil-window-mru             :which-key "previous window")
-  "w v"         '(evil-window-vsplit          :which-key "evil-window-vsplit")
-  "w s"         '(evil-window-split           :which-key "evil-window-split")
-  "w h"         '(evil-window-split           :which-key "evil-window-split")
-  "w -"         '(evil-window-decrease-height :which-key "evil-window-decrease-height")
-  "w ,"         '(evil-window-decrease-width  :which-key "evil-window-decrease-width")
-  "w _"         '(evil-window-set-height      :which-key "evil-window-set-height")
-  "w |"         '(evil-window-set-height      :which-key "evil-window-set-width"))
+ "w"           '(                            :which-key "window-select" :ignore t)
+ "w <up>"      '(evil-window-up              :which-key "evil window up")
+ "<up>"        '(evil-window-up              :which-key "evil window up")
+ "w <down>"    '(evil-window-down            :which-key "evil window down")
+ "<down>"      '(evil-window-down            :which-key "evil window down")
+ "w <left>"    '(evil-window-left            :which-key "evil window left")
+ "<left>"      '(evil-window-left            :which-key "evil window left")
+ "w <right>"   '(evil-window-right           :which-key "evil window right")
+ "<right>"     '(evil-window-right           :which-key "evil window right")
+ "w S-<up>"    '(+evil/window-move-up        :which-key "evil window move up")
+ "w S-<down>"  '(+evil/window-move-down      :which-key "evil window move down")
+ "w S-<left>"  '(+evil/window-move-left      :which-key "evil window move left")
+ "w S-<right>" '(+evil/window-move-right     :which-key "evil window move right")
+ "w w"         '(evil-window-next            :which-key "next window")
+ "w u"         '(winner-undo                 :which-key "winner undo")
+ "w r"         '(winner-redo                 :which-key "winner redo")
+ "w M"         '(delete-other-windows        :which-key "close other windows")
+ "w e"         '(delete-other-windows        :which-key "close other windows")
+ "w q"         '(evil-quit                   :which-key "close evil window")
+ "w n"         '(evil-window-new             :which-key "new window")
+ "w p"         '(evil-window-mru             :which-key "previous window")
+ "w v"         '(evil-window-vsplit          :which-key "evil-window-vsplit")
+ "w s"         '(evil-window-split           :which-key "evil-window-split")
+ "w h"         '(evil-window-split           :which-key "evil-window-split")
+ "w -"         '(evil-window-decrease-height :which-key "evil-window-decrease-height")
+ "w ,"         '(evil-window-decrease-width  :which-key "evil-window-decrease-width")
+ "w _"         '(evil-window-set-height      :which-key "evil-window-set-height")
+ "w |"         '(evil-window-set-height      :which-key "evil-window-set-width"))
 #+end_src
 
 ** Toggler Bindings
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
-  "u"   '(universal-argument                        :which-key "universal-argument")
-  "t a" '(org-appear-mode                           :which-key "toggle org appear mode")
-  "t w" '(visual-line-mode                          :which-key "toggle wrapping lines")
-  "t c" '(global-display-fill-column-indicator-mode :which-key "toggle fill column")
-  "t C" '(ey/toggle-center-buffer-content           :which-key "toggle center buffer content")
-  "t B" '(global-blamer-mode                        :which-key "toggle global blamer mode")
-  "t l" '(display-line-numbers-mode                 :which-key "toggle line numbers")
-  "t v" '(visible-mode                              :which-key "toggle visibility")
-  "t s" '(jinx-mode                                 :which-key "toggle local spell checks")
-  "t S" '(global-jinx-mode                          :which-key "toggle global spell checks"))
+ "u"   '(universal-argument                        :which-key "universal-argument")
+ "t a" '(org-appear-mode                           :which-key "toggle org appear mode")
+ "t w" '(visual-line-mode                          :which-key "toggle wrapping lines")
+ "t c" '(global-display-fill-column-indicator-mode :which-key "toggle fill column")
+ "t C" '(ey/toggle-center-buffer-content           :which-key "toggle center buffer content")
+ "t B" '(global-blamer-mode                        :which-key "toggle global blamer mode")
+ "t l" '(display-line-numbers-mode                 :which-key "toggle line numbers")
+ "t v" '(visible-mode                              :which-key "toggle visibility")
+ "t s" '(jinx-mode                                 :which-key "toggle local spell checks")
+ "t S" '(global-jinx-mode                          :which-key "toggle global spell checks"))
 #+end_src
 
 ** Dired Maps
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
-  "."   '(find-file  :which-key "find-file")
-  ;; "d j" '(dired      :which-key "Open dired")
-  "o -" '(dired-jump :which-key "Dired jump to current"))
+ "."   '(find-file  :which-key "find-file")
+ ;; "d j" '(dired      :which-key "Open dired")
+ "o -" '(dired-jump :which-key "Dired jump to current"))
 #+end_src
 
 ** TODO Perspective
@@ -3923,13 +3932,13 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 ** Version Control Mappings
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
-  "g g" '(magit-status               :which-key "magit-status")
-  "g G" '(magit-status-here          :which-key "magit-status-here")
-  "g b" '(magit-branch-checkout      :which-key "magit-branch-checkout")
-  "g /" '(magit-dispatch             :which-key "magit-dispatch")
-  "g =" '(diff-hl-show-hunk          :which-key "diff-hl-show-hunk")
-  "g s" '(diff-hl-stage-current-hunk :which-key "diff-hl-stage-current-hunk")
-  "g d" '(diff-hl-revert-hunk        :which-key "diff-hl-revert-hunk"))
+ "g g" '(magit-status               :which-key "magit-status")
+ "g G" '(magit-status-here          :which-key "magit-status-here")
+ "g b" '(magit-branch-checkout      :which-key "magit-branch-checkout")
+ "g /" '(magit-dispatch             :which-key "magit-dispatch")
+ "g =" '(diff-hl-show-hunk          :which-key "diff-hl-show-hunk")
+ "g s" '(diff-hl-stage-current-hunk :which-key "diff-hl-stage-current-hunk")
+ "g d" '(diff-hl-revert-hunk        :which-key "diff-hl-revert-hunk"))
 #+end_src
 
 * Runtime Performance (Control when garbage collection occurs)
