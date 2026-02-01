@@ -600,14 +600,6 @@ at the values with which this function was called."
   (general-evil-setup)) ;; TODO: check if short-names should be t???
 #+end_src
 
-* SaveHist Mode
-#+begin_src emacs-lisp :tangle post-init.el
-(use-package savehist
-  :hook (after-init . savehist-mode)
-  :config
-  (setq savehist-autosave-interval 300))
-#+end_src
-
 * Which Key
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package which-key
