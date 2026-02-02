@@ -3,11 +3,6 @@
 #+OPTIONS: toc:2
 #+STARTUP: overview
 
-* Lexical Binding
-#+begin_src emacs-lisp :tangle post-init.el
-;;; post-init.el --- after init file -*- no-byte-compile: t; lexical-binding: t; -*-
-#+end_src
-
 * Clean Up .emacs.d
 #+begin_src emacs-lisp :tangle pre-early-init.el
 ;; Reducing clutter in ~/.emacs.d by redirecting files to ~/emacs.d/var/
@@ -15,64 +10,6 @@
 (setq minimal-emacs-var-dir (expand-file-name "var/" minimal-emacs-user-directory))
 (setq package-user-dir (expand-file-name "elpa" minimal-emacs-var-dir))
 (setq user-emacs-directory minimal-emacs-var-dir)
-#+end_src
-
-* Package Loading Notifier
-#+begin_src emacs-lisp :tangle post-init.el
-(use-package package-loading-notifier
-  ;; :hook (after-init . package-loading-notifier-mode)
-  :defer t
-  :config
-  (setq package-loading-notifier-packages '(org magit yasnippet)))
-#+end_src
-
-* Page Break Lines
-#+begin_src emacs-lisp :tangle post-init.el
-(use-package page-break-lines
-  :hook (emacs-lisp-mode . page-break-lines-mode)
-  :hook (emacs-lisp-compilation-mode . page-break-lines-mode)
-  :hook (c-mode . page-break-lines-mode)
-  :hook (compilation-mode . page-break-lines-mode)
-  :hook (emacs-news-mode . page-break-lines-mode))
-#+end_src
-
-* Compile Angel
-#+begin_src emacs-lisp :tangle post-init.el
-;; Ensure adding the following compile-angel code at the very beginning
-;; of your `~/.emacs.d/post-init.el` file, before all other packages.
-
-(use-package async
-  :ensure t
-  :init
-  ;; (setq async-bytecomp-allowed-packages '(all))
-  :config
-  (async-bytecomp-package-mode 1))
-
-(use-package compile-angel
-  :ensure t
-  :demand t
-  :custom
-  ;; Set `compile-angel-verbose` to nil to suppress output from compile-angel.
-  ;; Drawback: The minibuffer will not display compile-angel's actions.
-  (compile-angel-verbose nil)
-
-  :config
-  ;; The following directive prevents compile-angel from compiling your init
-  ;; files. If you choose to remove this push to `compile-angel-excluded-files'
-  ;; and compile your pre/post-init files, ensure you understand the
-  ;; implications and thoroughly test your code. For example, if you're using
-  ;; `use-package', you'll need to explicitly add `(require 'use-package)` at
-  ;; the top of your init file.
-  (push (concat user-emacs-directory "pre-init.el") compile-angel-excluded-files)
-  (push (concat user-emacs-directory "post-init.el") compile-angel-excluded-files)
-  (push (concat user-emacs-directory "pre-early-init.el") compile-angel-excluded-files)
-  (push (concat user-emacs-directory "post-early-init.el") compile-angel-excluded-files)
-
-  ;; A local mode that compiles .el files whenever the user saves them.
-  ;; (add-hook 'emacs-lisp-mode-hook #'compile-angel-on-save-local-mode)
-
-  ;; A global mode that compiles .el files before they are loaded.
-  (compile-angel-on-load-mode))
 #+end_src
 
 * Startup Performance
@@ -100,6 +37,124 @@
 (add-hook 'emacs-startup-hook #'display-startup-time 100)
 
 (setq minimal-emacs-gc-cons-threshold (* 64 1024 1024))
+#+end_src
+
+* Lexical Binding
+#+begin_src emacs-lisp :tangle post-init.el
+;;; post-init.el --- after init file -*- no-byte-compile: t; lexical-binding: t; -*-
+#+end_src
+
+* Elpaca
+#+begin_src emacs-lisp :tangle post-init.el
+(setq package-enable-at-startup nil)
+(defvar elpaca-installer-version 0.11)
+(defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
+(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+(defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+                       :ref nil :depth 1 :inherit ignore
+                       :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                       :build (:not elpaca--activate-package)))
+(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+       (build (expand-file-name "elpaca/" elpaca-builds-directory))
+       (order (cdr elpaca-order))
+       (default-directory repo))
+  (add-to-list 'load-path (if (file-exists-p build) build repo))
+  (unless (file-exists-p repo)
+    (make-directory repo t)
+    (when (<= emacs-major-version 28) (require 'subr-x))
+    (condition-case-unless-debug err
+        (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                  ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
+                                                  ,@(when-let* ((depth (plist-get order :depth)))
+                                                      (list (format "--depth=%d" depth) "--no-single-branch"))
+                                                  ,(plist-get order :repo) ,repo))))
+                  ((zerop (call-process "git" nil buffer t "checkout"
+                                        (or (plist-get order :ref) "--"))))
+                  (emacs (concat invocation-directory invocation-name))
+                  ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                        "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                  ((require 'elpaca))
+                  ((elpaca-generate-autoloads "elpaca" repo)))
+            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+          (error "%s" (with-current-buffer buffer (buffer-string))))
+      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+  (unless (require 'elpaca-autoloads nil t)
+    (require 'elpaca)
+    (elpaca-generate-autoloads "elpaca" repo)
+    (let ((load-source-file-function nil)) (load "./elpaca-autoloads"))))
+(add-hook 'after-init-hook #'elpaca-process-queues)
+(elpaca `(,@elpaca-order))
+(unless (eq system-type 'windows-nt)
+    (elpaca-no-symlink-mode))
+
+(elpaca elpaca-use-package
+  ;; Enable use-package :ensure support for Elpaca.
+  (elpaca-use-package-mode))
+
+;;When installing a package used in the init file itself,
+;;e.g. a package which adds a use-package key word,
+;;use the :wait recipe keyword to block until that package is installed/configured.
+;;For example:
+;;(use-package general :ensure (:wait t) :demand t)
+#+end_src
+
+* Package Loading Notifier
+#+begin_src emacs-lisp :tangle post-init.el
+(use-package package-loading-notifier
+  ;; :hook (elpaca-after-init . package-loading-notifier-mode)
+  :defer t
+  :config
+  (setq package-loading-notifier-packages '(org magit yasnippet)))
+#+end_src
+
+* Page Break Lines
+#+begin_src emacs-lisp :tangle post-init.el
+(use-package page-break-lines
+  :hook (emacs-lisp-mode . page-break-lines-mode)
+  :hook (emacs-lisp-compilation-mode . page-break-lines-mode)
+  :hook (c-mode . page-break-lines-mode)
+  :hook (compilation-mode . page-break-lines-mode)
+  :hook (emacs-news-mode . page-break-lines-mode))
+#+end_src
+
+* Async
+#+begin_src emacs-lisp :tangle post-init.el
+(use-package async
+  :ensure (:wait t) ; `dired-async-mode`
+  :config
+  (async-bytecomp-package-mode 1))
+#+end_src
+* Compile Angel [No Tangle]
+#+begin_src emacs-lisp
+;; Ensure adding the following compile-angel code at the very beginning
+;; of your `~/.emacs.d/post-init.el` file, before all other packages.
+
+(use-package compile-angel
+  :ensure (:wait t)
+  :demand t
+  :custom
+  ;; Set `compile-angel-verbose` to nil to suppress output from compile-angel.
+  ;; Drawback: The minibuffer will not display compile-angel's actions.
+  (compile-angel-verbose nil)
+
+  :config
+  ;; The following directive prevents compile-angel from compiling your init
+  ;; files. If you choose to remove this push to `compile-angel-excluded-files'
+  ;; and compile your pre/post-init files, ensure you understand the
+  ;; implications and thoroughly test your code. For example, if you're using
+  ;; `use-package', you'll need to explicitly add `(require 'use-package)` at
+  ;; the top of your init file.
+  (push (concat user-emacs-directory "pre-init.el") compile-angel-excluded-files)
+  (push (concat user-emacs-directory "post-init.el") compile-angel-excluded-files)
+  (push (concat user-emacs-directory "pre-early-init.el") compile-angel-excluded-files)
+  (push (concat user-emacs-directory "post-early-init.el") compile-angel-excluded-files)
+
+  ;; A local mode that compiles .el files whenever the user saves them.
+  ;; (add-hook 'emacs-lisp-mode-hook #'compile-angel-on-save-local-mode)
+
+  ;; A global mode that compiles .el files before they are loaded.
+  (compile-angel-on-load-mode))
 #+end_src
 
 * User Info
@@ -214,31 +269,14 @@
 (setq frame-title-format "")
 #+end_src
 
-* TODO MELPA and others
+* TODO MELPA and other package repositories
 #+begin_src emacs-lisp :tangle post-init.el
-;; (require 'package)
-
 ;; Add package archives
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
 (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t)
-
-;; Set the GPG program and home directory
-;; (setq epg-gpg-program "gpg")
-;; (setq epg-gpg-home-directory (expand-file-name "~/.gnupg"))
-
-;; Temporarily disable signature checking to refresh package contents
-(unless package-archive-contents
-  (let ((package-check-signature nil))
-    (package-refresh-contents)))
-
-;; Re-enable signature checking after refreshing contents
-;; (setq package-check-signature t)
-
-;; Initialize package system
-(package-initialize t)
 #+end_src
 
 * Utility Functions
@@ -272,7 +310,8 @@ at the values with which this function was called."
 * SaveHist Mode
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package savehist
-  :hook (after-init . savehist-mode)
+  :ensure nil
+  :hook (elpaca-after-init . savehist-mode)
   :config
   (setq savehist-autosave-interval 300))
 #+end_src
@@ -317,7 +356,8 @@ at the values with which this function was called."
 
 (use-package evil
   :demand t
-  :hook (after-init . evil-mode)
+  :ensure (:wait t)
+  :hook (elpaca-after-init . evil-mode)
   :init
   (defvar evil-mode-buffers '()) ; temp fix for https://github.com/emacs-evil/evil/issues/1983
   (setq evil-want-integration t)
@@ -338,6 +378,7 @@ at the values with which this function was called."
   (evil-set-initial-state 'messages-buffer-mode 'normal)
   (evil-set-initial-state 'dashboard-mode 'normal)
   (evil-set-initial-state 'shell-command-mode 'normal)
+  (evil-set-initial-state 'minibuffer-mode 'insert)
   (setq evil-insert-state-cursor 'box)
   (setq evil-echo-state nil))
 
@@ -426,7 +467,7 @@ at the values with which this function was called."
 (use-package corfu
   :ensure t
   :defer t
-  :hook (after-init . global-corfu-mode)
+  :hook (elpaca-after-init . global-corfu-mode)
   :config
   ;; Hide commands in M-x which do not apply to the current mode.
   (setq read-extended-command-predicate #'command-completion-default-include-p)
@@ -595,6 +636,7 @@ at the values with which this function was called."
 * General Keybinding Package
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package general
+  :ensure (:wait t)
   :demand t
   :config
   (general-evil-setup)) ;; TODO: check if short-names should be t???
@@ -708,7 +750,8 @@ at the values with which this function was called."
 * Recentf mode
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package recentf
-  :hook (after-init . recentf-mode)
+  :ensure nil
+  :hook (elpaca-after-init . recentf-mode)
   :hook (kill-emacs . recentf-cleanup)
   :config
   (setq recentf-max-saved-items 500))
@@ -744,7 +787,7 @@ at the values with which this function was called."
 * Emojies
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package emojify
-  :hook (after-init . global-emojify-mode))
+  :hook (elpaca-after-init . global-emojify-mode))
 #+end_src
 
 * Dired
@@ -782,7 +825,7 @@ at the values with which this function was called."
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package ws-butler
   ;; a less intrusive `delete-trailing-whitespaces' on save
-  :hook (after-init . ws-butler-global-mode)
+  :hook (elpaca-after-init . ws-butler-global-mode)
   ;; :config
   ;; (pushnew! ws-butler-global-exempt-modes
   ;;           'special-mode
@@ -822,9 +865,8 @@ at the values with which this function was called."
 * TODO Diff HL
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package diff-hl
-  :ensure t
-  :vc (:url "https://github.com/dgutov/diff-hl")
-  ;; :hook (after-init . global-diff-hl-mode)
+  :ensure (:host github :repo "dgutov/diff-hl")
+  ;; :hook (elpaca-after-init . global-diff-hl-mode)
   :hook (diff-hl-mode . diff-hl-flydiff-mode)
   :commands diff-hl-stage-current-hunk diff-hl-revert-hunk diff-hl-next-hunk diff-hl-previous-hunk diff-hl-bmp-max-width
   :config
@@ -946,9 +988,8 @@ of the fringe.  When the fringe is hidden, this value is also used."
   :defer t)
 
 (use-package diff-ansi
-  :ensure t
+  :ensure (:host codeberg :repo "ideasman42/emacs-diff-ansi")
   :defer t
-  :vc (:url "https://codeberg.org/ideasman42/emacs-diff-ansi")
   :commands (diff-ansi-mode diff-ansi-buffer))
 #+end_src
 
@@ -1001,7 +1042,7 @@ of the fringe.  When the fringe is hidden, this value is also used."
 * Modeline
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package doom-modeline
-  :hook (after-init . doom-modeline-mode)
+  :hook (elpaca-after-init . doom-modeline-mode)
   :hook (doom-modeline-mode . size-indication-mode)
   :config
   (setq doom-modeline-height 28
@@ -1047,6 +1088,7 @@ of the fringe.  When the fringe is hidden, this value is also used."
 
 (use-package autorevert
   ;; revert buffers when their files/state have changed
+  :ensure nil
   :hook (focus-in . doom-auto-revert-buffers-h)
   :hook (after-save . doom-auto-revert-buffers-h)
   :hook (doom-switch-buffer . doom-auto-revert-buffer-h)
@@ -1178,7 +1220,7 @@ Else do `vertico-exit'."
     (vertico-exit))))
 
 (use-package vertico
-  :ensure nil
+  :ensure t
   :demand t
   :bind
   (:map vertico-map
@@ -1222,7 +1264,7 @@ Else do `vertico-exit'."
   :ensure t
   :defer t
   :commands vertico-mode
-  :hook (after-init . vertico-mode)
+  :hook (elpaca-after-init . vertico-mode)
   :config
   (setq vertico-count 10)
   (setq vertico-resize nil)
@@ -1283,6 +1325,7 @@ Else do `vertico-exit'."
 * Doom Themes
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package doom-themes
+  :ensure (:wait t)
   :defer t
   :config
   ;; Global settings (defaults)
@@ -1313,14 +1356,14 @@ Else do `vertico-exit'."
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package gruber-darker-theme)
 (use-package vscdark-theme
-  :vc (:url "https://github.com/EyoelYT/vscdark-theme"))
+  :ensure (:host github :repo "EyoelYT/vscdark-theme"))
 (use-package idea-darkula-theme)
 (use-package basic-theme)
 (use-package white-theme)
 (use-package ubuntu-theme)
 (use-package naysayer-theme)
 (use-package kanagawa-themes
-  :vc (:url "https://github.com/EyoelYT/kanagawa-emacs")
+  :ensure (:host github :repo "EyoelYT/kanagawa-emacs")
   :config
   (setq kanagawa-themes-org-height nil))
 (use-package standard-themes)
@@ -1329,10 +1372,10 @@ Else do `vertico-exit'."
 (use-package simplicity-theme)
 (use-package underwater-theme)
 (use-package doric-themes
-  :vc (:url "https://github.com/protesilaos/doric-themes"))
+  :ensure (:host github :repo "protesilaos/doric-themes"))
 (use-package github-dark-vscode-theme)
 (use-package tangonov-theme
-  :vc (:url "https://codeberg.org/trevdev/tangonov-theme"))
+  :ensure (:host codeberg :repo "trevdev/tangonov-theme"))
 (use-package catppuccin-theme)
 #+end_src
 
@@ -1478,9 +1521,8 @@ Else do `vertico-exit'."
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package consult-everything
   :if (eq system-type 'windows-nt)
-  :vc (:url "https://github.com/jthaman/consult-everything")
+  :ensure (:host github :repo "jthaman/consult-everything")
   :after consult
-  :ensure t
   :defer t)
 
 (define-leader-keys
@@ -1690,7 +1732,7 @@ Else do `vertico-exit'."
   ;; Marginalia must be activated in the :init section of use-package such that
   ;; the mode gets enabled right away. Note that this forces loading the
   ;; package.
-  (after-init . marginalia-mode)
+  (elpaca-after-init . marginalia-mode)
   :config
   (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
 #+end_src
@@ -1745,11 +1787,10 @@ Else do `vertico-exit'."
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package doom-snippets
   :defer nil
-  :vc (:url "https://github.com/doomemacs/snippets")
-  ;; :load-path (expand-file-name "doom-snippets/" minimal-emacs-var-dir)
+  :ensure (:host github :repo "doomemacs/snippets")
   :after yasnippet
   :preface
-  (setq doom-snippets-dir (expand-file-name "doom-snippets/" package-user-dir)))
+  (setq doom-snippets-dir (expand-file-name "repos/snippets/" elpaca-directory)))
 #+end_src
 
 * Custom Functions
@@ -2884,13 +2925,13 @@ See minad/consult#770."
 ;;   )
 #+end_src
 
-* TODO Persp-Mode
-#+begin_src emacs-lisp :tangle post-init.el
+* TODO Persp-Mode [No Tangle]
+#+begin_src emacs-lisp
 ;; (use-package persp-mode
 ;;   :ensure nil ; temporary
 ;;   :defer t
 ;;   :commands persp-switch-to-buffer)
-;;   :hook (after-init . persp-mode)
+;;   :hook (elpaca-after-init . persp-mode)
 ;;   :config
 ;;   (setq persp-autokill-buffer-on-remove 'kill-weak
 ;;         persp-reset-windows-on-nil-window-conf nil
@@ -3023,9 +3064,10 @@ https://github.com/wasamasa/eyebrowse
 https://github.com/alphapapa/activities.el
 
 * Steam
-#+begin_src emacs-lisp :tangle post-early-init.el
+#+begin_src emacs-lisp :tangle post-init.el
 (use-package steam
-  :ensure t
+  :ensure (:host github :repo "Kungsgeten/steam.el")
+  ;; (:package "steam" :source "MELPA" :protocol https :inherit t :depth treeless :repo "Kungsgeten/steam.el" :fetcher github :files ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo" "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo" "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi" "docs/*.texinfo" (:exclude ".dir-locals.el" "test.el" "tests.el" "*-test.el" "*-tests.el" "LICENSE" "README*" "*-pkg.el")))
   :defer t
   :config
   (setq steam-username "BluMagic8876"))
@@ -3140,7 +3182,7 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 * Spacious Padding Mode
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package spacious-padding
-  :hook (after-init . spacious-padding-mode)
+  :hook (elpaca-after-init . spacious-padding-mode)
   :config
   (setq spacious-padding-widths
         '(:internal-border-width 20
@@ -3183,7 +3225,7 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 * Ultra Scroll
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package ultra-scroll
-  :vc (:url "https://github.com/jdtsmith/ultra-scroll")
+  :ensure (:host github :repo "jdtsmith/ultra-scroll")
   :init
   (setq scroll-conservatively 0
         scroll-margin 0)
@@ -3365,6 +3407,7 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 ** JS Mode
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package js
+  :ensure nil
   :config
   (setq js-indent-level 2))
 
@@ -3393,6 +3436,7 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 * Eshell
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package eshell
+  :ensure nil
   :defer t
   :hook (eshell-mode . compilation-shell-minor-mode)
   :config
@@ -3466,9 +3510,8 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 * Bookmarks
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package bookmark+
-  :vc (:url "https://github.com/emacsmirror/bookmark-plus")
+  :ensure (:host github :repo "emacsmirror/bookmark-plus")
   :after org
-  :ensure nil
   :defer t
   :init
   (setq bmkp-bookmark-map-prefix-keys          (list (kbd " b p"))
