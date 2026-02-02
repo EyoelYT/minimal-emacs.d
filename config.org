@@ -3441,7 +3441,15 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
   (setq eshell-scroll-to-bottom-on-input t)
   (setq eshell-scroll-to-bottom-on-output 'others)
   (setq eshell-kill-processes-on-exit nil)
-  (setq eshell-hist-ignoredups 'erase))
+  (setq eshell-hist-ignoredups 'erase)
+
+  (defun +eshell/quit-or-delete-char (arg)
+    "Delete a character (ahead of the cursor) or quit eshell if there's nothing to
+delete."
+    (interactive "p")
+    (if (and (eolp) (looking-back eshell-prompt-regexp nil))
+        (eshell-life-is-too-much)
+      (delete-char arg))))
 
 (use-package eshell-syntax-highlighting
   :hook (eshell-mode . eshell-syntax-highlighting-mode)
@@ -3840,6 +3848,9 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 (define-leader-keys
  "o e" '(eshell         :which-key "eshell")
  "o E" '(project-eshell :which-key "project eshell"))
+
+(with-eval-after-load 'eshell
+  (evil-define-key '(insert emacs) eshell-mode-map (kbd "C-d") #'+eshell/quit-or-delete-char))
 #+end_src
 
 ** Isearch visual windows
