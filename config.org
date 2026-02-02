@@ -123,7 +123,7 @@
 (use-package async
   :ensure (:wait t) ; `dired-async-mode`
   :config
-  (async-bytecomp-package-mode 1))
+  (dired-async-mode 1))
 #+end_src
 * Compile Angel [No Tangle]
 #+begin_src emacs-lisp
@@ -797,8 +797,7 @@ at the values with which this function was called."
   :commands dired-jump
   :init
   (setq dired-dwim-target t
-        dired-kill-when-opening-new-dired-buffer t)
-  (dired-async-mode 1))
+        dired-kill-when-opening-new-dired-buffer t))
 #+end_src
 
 ** Dired Icons
@@ -3067,7 +3066,6 @@ https://github.com/alphapapa/activities.el
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package steam
   :ensure (:host github :repo "Kungsgeten/steam.el")
-  ;; (:package "steam" :source "MELPA" :protocol https :inherit t :depth treeless :repo "Kungsgeten/steam.el" :fetcher github :files ("*.el" "*.el.in" "dir" "*.info" "*.texi" "*.texinfo" "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo" "lisp/*.el" "docs/dir" "docs/*.info" "docs/*.texi" "docs/*.texinfo" (:exclude ".dir-locals.el" "test.el" "tests.el" "*-test.el" "*-tests.el" "LICENSE" "README*" "*-pkg.el")))
   :defer t
   :config
   (setq steam-username "BluMagic8876"))
