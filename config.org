@@ -1518,14 +1518,14 @@ Else do `vertico-exit'."
 
 * Consult Everything
 #+begin_src emacs-lisp :tangle post-init.el
-(use-package consult-everything
-  :if (eq system-type 'windows-nt)
-  :ensure (:host github :repo "jthaman/consult-everything")
-  :after consult
-  :defer t)
+(if (eq system-type 'windows-nt)
+    (use-package consult-everything
+      :ensure (:host github :repo "jthaman/consult-everything")
+      :after consult
+      :defer t)
 
-(define-leader-keys
- "s E" '(consult-everything :wk "Search Everything"))
+  (define-leader-keys
+   "s E" '(consult-everything :wk "Search Everything")))
 #+end_src
 
 * Dumb Jump
