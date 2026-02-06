@@ -85,7 +85,7 @@
     (let ((load-source-file-function nil)) (load "./elpaca-autoloads"))))
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
-(unless (eq system-type 'windows-nt)
+(if (eq system-type 'windows-nt)
     (elpaca-no-symlink-mode))
 
 (elpaca elpaca-use-package
@@ -842,6 +842,11 @@ at the values with which this function was called."
 #+end_src
 
 * TODO Magit
+#+begin_src emacs-lisp :tangle post-init.el
+(use-package transient
+  :defer t
+  :ensure (:wait t))
+#+end_src
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package magit
   :init (setq magit-auto-revert-mode nil)
