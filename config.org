@@ -3965,6 +3965,13 @@ delete."
  "t S" '(global-jinx-mode                          :which-key "toggle global spell checks"))
 #+end_src
 
+** Universal Argument more
+#+begin_src emacs-lisp :tangle post-init.el
+(with-eval-after-load 'general
+  (define-key universal-argument-map (kbd "SPC u") #'universal-argument-more)
+  (define-key universal-argument-map (kbd "M-SPC u") #'universal-argument-more))
+#+end_src
+
 ** Dired Maps
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
