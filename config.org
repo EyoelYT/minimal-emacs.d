@@ -352,13 +352,12 @@ at the values with which this function was called."
 
 * Evil Mode
 #+begin_src emacs-lisp :tangle post-init.el
-(defvar evil-respect-visual-line-mode t)
-
 (use-package evil
   :demand t
   :ensure (:wait t)
   :hook (elpaca-after-init . evil-mode)
   :init
+  (defvar evil-respect-visual-line-mode t)
   (defvar evil-mode-buffers '()) ; temp fix for https://github.com/emacs-evil/evil/issues/1983
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
@@ -2389,46 +2388,47 @@ re-align the table if necessary. (Necessary because org-mode has a
 
 ** Escape Key
 #+begin_src emacs-lisp :tangle post-init.el
-(defvar doom-escape-hook nil
-  "A hook run when C-g is pressed (or ESC in normal mode, for evil users).
+(with-eval-after-load 'evil
+  (defvar doom-escape-hook nil
+    "A hook run when C-g is pressed (or ESC in normal mode, for evil users).
 
 More specifically, when `doom/escape' is pressed. If any hook returns non-nil,
 all hooks after it are ignored.")
 
-(defun +evil-disable-ex-highlights-h ()
-  "Disable ex search buffer highlights."
-  (when (evil-ex-hl-active-p 'evil-ex-search)
-    (evil-ex-nohighlight)
-    t))
+  (defun +evil-disable-ex-highlights-h ()
+    "Disable ex search buffer highlights."
+    (when (evil-ex-hl-active-p 'evil-ex-search)
+      (evil-ex-nohighlight)
+      t))
 
-(add-hook 'doom-escape-hook #'+evil-disable-ex-highlights-h)
+  (add-hook 'doom-escape-hook #'+evil-disable-ex-highlights-h)
 
-(defun +evil-escape-a (&rest _)
-  "Call `doom/escape' if `evil-force-normal-state' is called interactively."
-  (when (called-interactively-p 'any)
-    (call-interactively #'doom/escape)))
+  (defun +evil-escape-a (&rest _)
+    "Call `doom/escape' if `evil-force-normal-state' is called interactively."
+    (when (called-interactively-p 'any)
+      (call-interactively #'doom/escape)))
 
-(advice-add 'evil-force-normal-state :after #'+evil-escape-a)
+  (advice-add 'evil-force-normal-state :after #'+evil-escape-a)
 
-(defun doom/escape (&optional interactive)
-  "Run `doom-escape-hook'."
-  (interactive (list 'interactive))
-  (let ((inhibit-quit t))
-    (cond ((minibuffer-window-active-p (minibuffer-window))
-           ;; quit the minibuffer if .
-           (when (and interactive (minibufferp))
-             (setq this-command 'abort-recursive-edit)
-             (abort-recursive-edit)))
-          ;; Run all escape hooks. If any returns non-nil, then stop there.
-          ((run-hook-with-args-until-success 'doom-escape-hook))
-          ;; don't abort macros
-          ((or defining-kbd-macro executing-kbd-macro) nil)
-          ;; Back to the default
-          ((unwind-protect (keyboard-quit)
-             (when interactive
-               (setq this-command 'keyboard-quit)))))))
+  (defun doom/escape (&optional interactive)
+    "Run `doom-escape-hook'."
+    (interactive (list 'interactive))
+    (let ((inhibit-quit t))
+      (cond ((minibuffer-window-active-p (minibuffer-window))
+             ;; quit the minibuffer if .
+             (when (and interactive (minibufferp))
+               (setq this-command 'abort-recursive-edit)
+               (abort-recursive-edit)))
+            ;; Run all escape hooks. If any returns non-nil, then stop there.
+            ((run-hook-with-args-until-success 'doom-escape-hook))
+            ;; don't abort macros
+            ((or defining-kbd-macro executing-kbd-macro) nil)
+            ;; Back to the default
+            ((unwind-protect (keyboard-quit)
+               (when interactive
+                 (setq this-command 'keyboard-quit)))))))
 
-(global-set-key [remap keyboard-quit] #'doom/escape)
+  (global-set-key [remap keyboard-quit] #'doom/escape))
 #+end_src
 
 ** Custom M-x compile
@@ -2913,9 +2913,8 @@ See minad/consult#770."
                          (t "** ")))
          (consult-fd-args '((if (executable-find "fdfind" 'remote) "fdfind" "fd") "--color=never"
                             "--full-path --absolute-path" "--hidden --exclude .git" "--no-ignore"
-                            (if (featurep :system 'windows) "--path-separator=/"))))
-    (if
-        (when-let* ((bin (if (ignore-errors (file-remote-p default-directory nil t))
+                            (if (featurep :system 'windows) "--path-separator=/")))) ; TODO: fix this
+    (if (when-let* ((bin (if (ignore-errors (file-remote-p default-directory nil t))
                              (cl-find-if (doom-rpartial #'executable-find t)
                                          (list "fdfind" "fd"))
                            doom-fd-executable))
