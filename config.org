@@ -1798,6 +1798,14 @@ Else do `vertico-exit'."
 #+end_src
 
 * Custom Functions
+** Reset log level
+#+begin_src emacs-lisp :tangle post-init.el
+(defun ey/set-debug-log-level-to-0 ()
+  "Revert `doom-log-level' to zero: No logging at all"
+  (interactive)
+  (setq magit-refresh-verbose nil
+        garbage-collection-messages nil))
+#+end_src
 ** Set Jump
 #+begin_src emacs-lisp :tangle post-init.el
 (defun doom-set-jump-a (fn &rest args)
