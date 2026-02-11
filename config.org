@@ -1826,8 +1826,8 @@ Else do `vertico-exit'."
         (apply fn args))
     (apply fn args)))
 
-(advice-add #'evil-toggle-fold :around #'+evil-toggle-fold-a)
-(advice-remove #'evil-toggle-fold #'+evil-toggle-fold-a)
+;; (advice-add #'evil-toggle-fold :around #'+evil-toggle-fold-a)
+;; (advice-remove #'evil-toggle-fold #'+evil-toggle-fold-a)
 #+end_src
 ** Windows Terminal
 #+begin_src emacs-lisp :tangle post-init.el
@@ -2927,8 +2927,8 @@ See minad/consult#770."
       (consult-find default-directory initial-input))))
 #+end_src
 
-* Pespectives
-#+begin_src emacs-lisp :tangle post-init.el
+* Pespectives [No Tangle]
+#+begin_src emacs-lisp
 ;; (use-package perspective
 ;;   :init (defvar persp-mode-prefix-key (kbd "p"))
 ;;   :config
@@ -3643,6 +3643,14 @@ delete."
  "p l" '(project-list-buffers            :which-key "project-list-buffers")
  "p R" '(project-query-replace-regexp    :which-key "project-query-replace-regexp")
  "p k" '(project-kill-buffers            :which-key "project-kill-buffers"))
+#+end_src
+
+** Text Scaling
+#+begin_src emacs-lisp :tangle post-init.el
+(define-key global-map (kbd "C-=") 'text-scale-increase)
+(define-key global-map (kbd "C--") 'text-scale-decrease)
+(define-key global-map (kbd "C-+") 'global-text-scale-adjust)
+(define-key global-map (kbd "C-_") 'global-text-scale-adjust)
 #+end_src
 
 ** TODO Unimpaired style maps
