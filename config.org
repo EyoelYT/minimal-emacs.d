@@ -252,6 +252,7 @@
 ;; (global-display-line-numbers-mode t)
 (xterm-mouse-mode 1)
 (global-subword-mode 1)
+(global-eldoc-mode -1)
 
 ;;;; Disable line numbers for some modes
 ;; (dolist (mode-hook '(org-mode-hook
