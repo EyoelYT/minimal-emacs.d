@@ -3440,22 +3440,20 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 (add-hook 'js-ts-mode-hook #'+treesit-set-font-lock-feature-list-js-like)
 #+end_src
 
-* TODO Spelling
+* Spelling
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package jinx
   :defer t
-  ;; :hook (text-mode . jinx-mode) ; (to automatically toggle spellcheck in text-mode-buffers)
+  :init
+  (with-eval-after-load 'vertico-multiform
+    (add-to-list 'vertico-multiform-categories '(jinx buffer)) ; to have it as grid in a temp buffer
+    (vertico-multiform-mode))
   :config
   (setq jinx-languages "en_US")
-  (setq jinx-camel-modes '(prog-mode)))
-
-(with-eval-after-load 'vertico-multiform
-  (add-to-list 'vertico-multiform-categories '(jinx buffer)) ; to have it as grid in a temp buffer
-  (vertico-multiform-mode))
-
-(evil-define-key 'normal global-map (kbd "z=") #'jinx-correct)
-(evil-define-key 'motion global-map (kbd "[s") #'jinx-previous)
-(evil-define-key 'motion global-map (kbd "]s") #'jinx-next)
+  (with-eval-after-load 'evil
+    (evil-define-key 'normal global-map (kbd "z=") #'jinx-correct)
+    (evil-define-key 'motion global-map (kbd "[s") #'jinx-previous)
+    (evil-define-key 'motion global-map (kbd "]s") #'jinx-next) (setq jinx-camel-modes '(prog-mode))))
 #+end_src
 
 * TODO Formatting
