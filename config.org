@@ -3084,6 +3084,21 @@ https://github.com/alphapapa/activities.el
   (setq steam-username "BluMagic8876"))
 #+end_src
 
+* Buffer Flip [No Tangle]
+Not using this I specifically want to exit buffer flip mode when Ctrl is released
+#+begin_src emacs-lisp
+(use-package buffer-flip
+  :ensure t
+  :config
+  (with-eval-after-load 'evil
+    (evil-define-key '(normal visual motion insert) global-map (kbd "C-<tab>") 'buffer-flip)
+    (evil-define-key '(normal visual motion insert) buffer-flip-map (kbd "C-<tab>") 'buffer-flip-forward)
+    (evil-define-key '(normal visual motion insert) buffer-flip-map (kbd "C-S-<tab>") 'buffer-flip-backward)
+    (evil-define-key '(normal visual motion insert) buffer-flip-map (kbd "C-ESC") 'buffer-flip-abort)
+    (with-eval-after-load 'magit
+      (evil-define-key '(normal) magit-section-mode-map (kbd "C-<tab>") 'buffer-flip))))
+#+end_src
+
 * Bufferfile
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package bufferfile
