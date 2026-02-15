@@ -3464,7 +3464,11 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 (use-package eshell
   :ensure nil
   :defer t
+  :init
+  (defun +eshell-remove-string-syntax ()
+    (modify-syntax-entry ?\" "_" eshell-mode-syntax-table))
   :hook (eshell-mode . compilation-shell-minor-mode)
+  :hook (eshell-mode . +eshell-remove-string-syntax)
   :config
   (setq eshell-scroll-to-bottom-on-input t)
   (setq eshell-scroll-to-bottom-on-output 'others)
