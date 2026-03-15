@@ -1746,7 +1746,13 @@ Else do `vertico-exit'."
 (use-package markdown-mode
   :defer t
   :mode ("README\\.md\\'" . gfm-mode)
-  :init (setq markdown-command "multimarkdown"))
+  :init (setq markdown-command "multimarkdown")
+  :config
+  (setq markdown-fontify-code-blocks-natively t))
+
+(use-package markdown-indent-mode
+  :ensure (:host github :repo "whhone/markdown-indent-mode")
+  :hook (markdown-mode . markdown-indent-mode))
 #+end_src
 
 * Drag Stuff
