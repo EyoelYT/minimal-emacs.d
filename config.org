@@ -1800,7 +1800,7 @@ Else do `vertico-exit'."
   :ensure (:host github :repo "doomemacs/snippets")
   :after yasnippet
   :preface
-  (setq doom-snippets-dir (expand-file-name "repos/snippets/" elpaca-directory)))
+  (setq doom-snippets-dir (expand-file-name "sources/snippets/" elpaca-directory)))
 #+end_src
 
 * Custom Functions
