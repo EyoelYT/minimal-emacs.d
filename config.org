@@ -190,6 +190,7 @@
 (setq delete-window-choose-selected nil) ; TODO: check if nil is better than `mru'!!
 (setq ring-bell-function 'ignore)
 (setq echo-keystrokes 1)
+(setq epa-file-cache-passphrase-for-symmetric-encryption t)
 (setq delete-by-moving-to-trash t)
 (setq trash-directory nil) ; make `trashed' compliant
 (setq history-delete-duplicates t)
@@ -267,6 +268,7 @@
 * My MacOS Sane Defaults
 #+begin_src emacs-lisp :tangle post-init.el
 (setq mac-command-modifier 'meta)
+(setq mac-right-option-modifier 'super)
 (setq frame-title-format "")
 #+end_src
 
@@ -320,23 +322,25 @@ at the values with which this function was called."
 * Frame
 #+begin_src emacs-lisp :tangle post-init.el
 (defun ey/add-stuff-to-default-buffer-alist ()
-  (add-to-list 'default-frame-alist '(right-divider-width . 1))
-  (add-to-list 'default-frame-alist '(bottom-divider-width . 1))
-  (add-to-list 'default-frame-alist '(top . 50))
-  (add-to-list 'default-frame-alist '(left . 200))
-  (add-to-list 'default-frame-alist '(horizontal-scroll-bars))
-  (add-to-list 'default-frame-alist '(vertical-scroll-bars))
-  (add-to-list 'default-frame-alist '(internal-border-width . 20))
-  ;; (add-to-list 'default-frame-alist '(font . "MonacoLigaturized Nerd Font-14"))
-  ;; (add-to-list 'default-frame-alist '(font . "FantasqueSansM Nerd Font-15"))
-  ;; (add-to-list 'default-frame-alist '(alpha . 99))
-  ;; (add-to-list 'default-frame-alist '(alphaBackground . 50))
-  ;; (add-to-list 'default-frame-alist '(undecorated . t))
-  ;; (add-to-list 'default-frame-alist '(fullscreen . fullboth))
-  ;; (add-to-list 'default-frame-alist '(width . 168)) ; was 166
-  ;; (add-to-list 'default-frame-alist '(height . (text-pixels . 1400)))
-  (add-to-list 'default-frame-alist '(left-fringe . 10))
-  (add-to-list 'default-frame-alist '(right-fringe . 10)))
+  "Add values to `default-frame-alist'"
+  (add-to-list 'default-frame-alist '(tool-bar-lines . 0))
+  (add-to-list 'default-frame-alist '(menu-bar-lines . 0))
+  (add-to-list 'default-frame-alist '(alpha-background . 100))
+  (when (getenv "WSLENV")
+    (add-to-list 'default-frame-alist `(width . (text-pixels . 2300))) ; 2145
+    (if (string-match-p (regexp-quote "LUCID") system-configuration-features)
+        (add-to-list 'default-frame-alist `(height . (text-pixels . 1480)))
+      (add-to-list 'default-frame-alist `(height . (text-pixels . 1490))))
+    (add-to-list 'default-frame-alist '(top . 15))
+    (add-to-list 'default-frame-alist '(left . 15))
+    (add-to-list 'default-frame-alist '(internal-border-width . 20))
+    (add-to-list 'default-frame-alist '(undecorated . t)))
+  (when (eq system-type 'darwin)
+    (add-to-list 'default-frame-alist '(top . 50))
+    (add-to-list 'default-frame-alist '(left . 120))
+    (add-to-list 'default-frame-alist '(height . 60))
+    (add-to-list 'default-frame-alist '(width . 170))
+    (add-to-list 'default-frame-alist '(undecorated . nil))))
 
 (ey/add-stuff-to-default-buffer-alist)
 
@@ -777,6 +781,19 @@ at the values with which this function was called."
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package nerd-icons
   :defer t)
+#+end_src
+
+* Macos Autotitle Bar
+#+begin_src emacs-lisp :tangle post-init.el
+(when (eq system-type 'darwin)
+  (use-package ns-auto-titlebar
+    :demand t
+    :ensure t
+    :config
+    (and (or (daemonp)
+             (display-graphic-p))
+         (require 'ns-auto-titlebar nil t)
+         (ns-auto-titlebar-mode 1))))
 #+end_src
 
 * Custom File
