@@ -2392,6 +2392,29 @@ re-align the table if necessary. (Necessary because org-mode has a
   (dotimes (_ count) (+org--insert-item 'above)))
 #+end_src
 
+** Org Mode General Functions
+#+begin_src emacs-lisp :tangle post-init.el
+(defun +org/remove-link ()
+  "Unlink the text at point."
+  (interactive)
+  (unless (org-in-regexp org-link-bracket-re 1)
+    (user-error "No link at point"))
+  (save-excursion
+    (let ((label (if (match-end 2)
+                     (match-string-no-properties 2)
+                   (org-link-unescape (match-string-no-properties 1)))))
+      (delete-region (match-beginning 0) (match-end 0))
+      (insert label))))
+
+(defun +org/yank-link ()
+  "Copy the url at point to the clipboard.
+If on top of an Org link, will only copy the link component."
+  (interactive)
+  (let ((url (thing-at-point 'url)))
+    (kill-new (or url (user-error "No URL at point")))
+    (message "Copied link: %s" url)))
+#+end_src
+
 ** FilePath Copy
 #+begin_src emacs-lisp :tangle post-init.el
 (defun +default/yank-buffer-path (&optional root)
@@ -3166,7 +3189,8 @@ Not using this I specifically want to exit buffer flip mode when Ctrl is release
                            ;; (if (string-match "\\`\\([^#]+\\)#" .path)
                            ;;     (match-string 1 .path)
                            ;;   .path)
-                           ) 'face 'font-lock-comment-face))))
+                           )
+                          'face 'font-lock-comment-face))))
 
   (defun devdocs--read-entries-grouped (prompt documents initial-input)
     "Read the name of an entry in one of the DOCUMENTS, using PROMPT.
@@ -3598,8 +3622,9 @@ delete."
   (with-eval-after-load 'evil-multiedit
     (evil-define-key '(normal visual insert) evil-multiedit-mode-map (kbd "M-d") 'evil-multiedit-match-and-next)
     (evil-define-key '(normal visual insert) evil-multiedit-mode-map (kbd "M-D") 'evil-multiedit-match-and-prev)
-    ;; (evil-define-key '(insert) evil-multiedit-mode-map (kbd "<return>") nil) ; To have RET insert newlines in multiedit modes
-    ;; (evil-define-key '(insert) evil-multiedit-mode-map (kbd "RET") nil)
+    ;; TODO: these two cause a "post-command-hook (iedit-update-occurrences): (wrong-type-argument number-or-marker-p nil)" error in org code blocks
+    (evil-define-key '(insert) evil-multiedit-mode-map (kbd "<return>") 'newline-and-indent) ; To have RET insert newlines in multiedit modes
+    (evil-define-key '(insert) evil-multiedit-mode-map (kbd "RET") 'newline-and-indent) ; To have RET insert newlines in multiedit modes
     (evil-define-key '(normal visual) evil-multiedit-mode-map (kbd "<return>") 'evil-multiedit-toggle-or-restrict-region)))
 #+end_src
 
@@ -3623,23 +3648,99 @@ delete."
     (define-key org-mode-map (kbd "C-S-<return>") '+org/insert-item-above)
     (define-key org-mode-map [C-return]   '+org/insert-item-below)
     (define-key org-mode-map [C-S-return] '+org/insert-item-above)
-    (evil-define-key '(normal visual insert motion emacs replace operator) org-mode-map (kbd "C-a")   'doom/backward-to-bol-or-indent) ; fixes C-a maps to `evil-paste-after'
+    (evil-define-key '(normal visual insert motion emacs replace operator) org-mode-map (kbd "C-a") 'doom/backward-to-bol-or-indent) ; fixes C-a maps to `evil-paste-after'
                                         ; also fixes org-beginning-of-line in src-blocks
-    ;; (evil-define-key nil org-mode-map (kbd "g l") nil)
-    (evil-define-key '(normal visual motion) org-mode-map (kbd "gl") 'evil-lion-left) ; TODO: check if not working currently
-    ))
+    (evil-define-key '(normal visual motion) org-mode-map (kbd "gl") 'evil-lion-left)))
 
 (define-leader-keys
- "o A"   'org-agenda)
+  "o A"   'org-agenda
+  "n o"   'org-clock-goto)
 
 (with-eval-after-load 'org
   (define-leader-keys
-   :keymaps 'org-mode-map
-   "m t"   '(org-todo                    :which-key "org-todo")
-   "m ."   '(consult-org-heading         :which-key "consult-org-heading")
-   "m /"   '(consult-org-agenda          :which-key "consult-org-agenda")
-   "m s r" '(org-refile                  :which-key "consult-org-agenda")
-   "m h"   '(org-toggle-heading          :which-key "org-toggle-heading")))
+    :keymaps 'org-mode-map
+    "m t"     'org-todo
+    "m ."     'consult-org-heading
+    "m /"     'consult-org-agenda
+    "m h"     'org-toggle-heading
+    "m A"     'org-archive-subtree-default
+    "m e"     'org-export-dispatch
+    "m f"     'org-footnote-action
+    "m h"     'org-toggle-heading
+    "m i"     'org-toggle-item
+    "m I"     'org-id-get-create
+    "m k"     'org-babel-remove-result
+    "m n"     'org-store-link
+    "m o"     'org-set-property
+    "m q"     'org-set-tags-command
+    "m t"     'org-todo
+    "m T"     'org-todo-list
+    "m x"     'org-toggle-checkbox
+    "m b"     '(:ignore t :which-key "table")
+    "m b -"   'org-table-insert-hline
+    "m b a"   'org-table-align
+    "m b b"   'org-table-blank-field
+    "m b c"   'org-table-create-or-convert-from-region
+    "m b e"   'org-table-edit-field
+    "m b f"   'org-table-edit-formulas
+    "m b h"   'org-table-field-info
+    "m b s"   'org-table-sort-lines
+    "m b r"   'org-table-recalculate
+    "m b R"   'org-table-recalculate-buffer-tables
+    "m b d"   '(:ignore t :which-key "delete")
+    "m b d c" 'org-table-delete-column
+    "m b d r" 'org-table-kill-row
+    "m b i"   '(:ignore t :which-key "insert")
+    "m b i c" 'org-table-insert-column
+    "m b i h" 'org-table-insert-hline
+    "m b i r" 'org-table-insert-row
+    "m b i H" 'org-table-hline-and-move
+    "m c"     '(:ignore t :which-key "clock")
+    "m c c"   'org-clock-cancel
+    "m c i"   'org-clock-in
+    "m c I"   'org-clock-in-last
+    "m c o"   'org-clock-out
+    "m c r"   'org-resolve-clocks
+    "m c R"   'org-clock-report
+    "m c t"   'org-evaluate-time-range
+    "m d"     '(:ignore t :which-key "date/deadline")
+    "m d d"   'org-deadline
+    "m d s"   'org-schedule
+    "m d t"   'org-time-stamp
+    "m d T"   'org-time-stamp-inactive
+    "m l"     '(:ignore t :which-key "links")
+    "m l i"   'org-id-store-link
+    "m l l"   'org-insert-link
+    "m l L"   'org-insert-all-links
+    "m l s"   'org-store-link
+    "m l S"   'org-insert-last-stored-link
+    "m l t"   'org-toggle-link-display
+    "m l y"   '+org/yank-link
+    "m l d"   '+org/remove-link
+    "m p"     '(:ignore t :which-key "publish")
+    "m p a"   'org-publish-all
+    "m p f"   'org-publish-current-file
+    "m p p"   'org-publish
+    "m p P"   'org-publish-current-project
+    "m s"     '(:ignore t :which-key "tree/subtree")
+    "m s a"   'org-toggle-archive-tag
+    "m s b"   'org-tree-to-indirect-buffer
+    "m s c"   'org-clone-subtree-with-time-shift
+    "m s d"   'org-cut-subtree
+    "m s h"   'org-promote-subtree
+    "m s j"   'org-move-subtree-down
+    "m s k"   'org-move-subtree-up
+    "m s l"   'org-demote-subtree
+    "m s n"   'org-narrow-to-subtree
+    "m s r"   'org-refile
+    "m s s"   'org-sparse-tree
+    "m s A"   'org-archive-subtree-default
+    "m s N"   'widen
+    "m s S"   'org-sort
+    "m p"     '(:ignore t :which-key "priority")
+    "m p p"   'org-priority
+    "m p u"   'org-priority-up
+    "m p d"   'org-priority-down))
 #+end_src
 
 ** Eldoc Mappings
@@ -3766,9 +3867,6 @@ delete."
 
 ** General Bindings
 #+begin_src emacs-lisp :tangle post-init.el
-;; (global-set-key (kbd "C-a")   'doom/backward-to-bol-or-indent)
-;; (global-set-key (kbd "C-S-i") 'ey/visual-to-first-non-blank-in-current-line)
-;; (global-set-key (kbd "C-S-a") 'ey/visual-to-last-non-blank-in-current-line)
 (global-set-key (kbd "C-q")   'google-search)
 (global-set-key (kbd "C-SPC") 'completion-at-point)
 (global-set-key (kbd "C-M-<return>")    'recompile)
@@ -3811,18 +3909,12 @@ delete."
     (define-key magit-status-mode-map (kbd "C-c C-p")                           'magit-section-up)
     (define-key magit-diff-section-map (kbd "C-<return>")                       'magit-diff-visit-file-other-window)
     (evil-define-key '(normal) magit-section-mode-map (kbd "C-<tab>")           'evil-switch-to-windows-last-buffer)
-    ;; (evil-define-key '(normal) magit-section-mode-map (kbd "<backtab>")         nil)
     (evil-define-key '(normal) magit-section-mode-map (kbd "<backtab>")         'magit-section-cycle)
     (evil-define-key '(normal) magit-section-mode-map (kbd "C-S-<down>")        'magit-section-forward)
     (evil-define-key '(normal) magit-section-mode-map (kbd "C-S-<up>")          'magit-section-backward)
     (evil-define-key '(normal) magit-section-mode-map (kbd "M-RET")             'magit-diff-visit-worktree-file-other-window)
     (evil-define-key '(normal) magit-section-mode-map (kbd "S-<return>")        'magit-diff-visit-worktree-file-other-window)
-    (evil-define-key '(normal visual) magit-mode-map "zz"                       'evil-scroll-line-to-center)
-    ;; (evil-define-key '(visual normal) magit-mode-map (kbd "C-<tab>")            'evil-switch-to-windows-last-buffer)
-    ;; (evil-define-key '(visual normal) magit-mode-map (kbd "C-S-<tab>")          'magit-section-cycle-global)
-    ;; (evil-define-key '(visual normal) magit-diff-section-base-map (kbd "S-<return>") 'magit-diff-visit-worktree-file-other-window)
-    ;; (evil-define-key '(visual normal) magit-diff-section-map (kbd "S-<return>") 'magit-diff-visit-worktree-file-other-window)
-    )) ; TODO: remove commented if no side effects
+    (evil-define-key '(normal visual) magit-mode-map "zz"                       'evil-scroll-line-to-center)))
 
 (with-eval-after-load 'transient
   (define-key transient-map (kbd "<escape>") 'transient-quit-one))
@@ -3834,7 +3926,6 @@ delete."
  "'" '(vertico-repeat-select  :which-key "vertico search history"))
 (with-eval-after-load 'vertico
   (define-key vertico-map (kbd "C-SPC") '+vertico/embark-preview)
-  ;; (define-key vertico-map (kbd "DEL")   'vertico-directory-delete-char)
   (define-key vertico-map [remap evil-delete-backward-char-and-join]  'vertico-directory-delete-char))
 (with-eval-after-load 'vertico-flat
   (define-key vertico-flat-map [remap left-char] 'left-char)
@@ -3889,14 +3980,12 @@ delete."
 (global-set-key (kbd "S-<up>") 'scroll-down-line)
 (global-set-key (kbd "S-<down>") 'scroll-up-line)
 (with-eval-after-load 'evil
-  ;; (global-set-key (kbd "C-<tab>")   'evil-switch-to-windows-last-buffer)
   (evil-define-key '(normal visual motion insert) global-map (kbd "C-<tab>") 'evil-switch-to-windows-last-buffer)
   (global-set-key (kbd "S-<left>")  'evil-scroll-left)
   (global-set-key (kbd "S-<right>") 'evil-scroll-right)
   (evil-define-key '(normal visual motion) global-map (kbd "<up>")    'evil-previous-visual-line)
   (evil-define-key '(normal visual motion) global-map (kbd "<down>")  'evil-next-visual-line)
   (evil-define-key 'operator               global-map (kbd "<up>")    'evil-previous-line)
-  ;; (define-leader-keys "`" '(+popup/toggle :which-key "+popup/toggle"))
   (evil-define-key 'operator               global-map (kbd "<down>")  'evil-next-line))
 
 (define-leader-keys
@@ -3930,7 +4019,6 @@ delete."
 ** Buffer Keybinds
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
- ;; :keymaps 'dired-mode-map
  "b"     '(                                   :which-key "buffer" :ignore t)
  "b i"   '(ibuffer                            :which-key "Ibuffer")
  "b o"   '(:ignore t                          :which-key "Buffer other window")
@@ -3956,10 +4044,9 @@ delete."
   (with-eval-after-load 'corfu
     (evil-define-key 'insert corfu-map (kbd "C-SPC") #'corfu-insert-separator)
     (evil-define-key 'insert corfu-map (kbd "TAB")   #'corfu-next)
-    ;; (evil-define-key 'insert corfu-map [tab] #'corfu-next) ; TODO: unnedded??
+    (evil-define-key 'insert corfu-map [tab] #'corfu-next)
     (evil-define-key 'insert corfu-map (kbd "S-TAB") #'corfu-previous)
-    ;; (evil-define-key 'insert corfu-map [backtab] #'corfu-previous) ; TODO: unnedded??
-    ))
+    (evil-define-key 'insert corfu-map [backtab] #'corfu-previous)))
 #+end_src
 
 ** Embark Mappings
