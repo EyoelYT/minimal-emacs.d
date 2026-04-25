@@ -1346,7 +1346,7 @@ Else do `vertico-exit'."
 * Doom Themes
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package doom-themes
-  :ensure (:wait t)
+  :ensure (:host github :repo "doomemacs/themes" :wait t)
   :defer t
   :config
   ;; Global settings (defaults)
