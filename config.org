@@ -751,6 +751,13 @@ at the values with which this function was called."
 ;; (use-package all-the-icons)
 #+end_src
 
+* Saveplace mode
+#+begin_src emacs-lisp :tangle post-init.el
+(use-package saveplace
+  :ensure nil
+  :hook (elpaca-after-init . save-place-mode))
+#+end_src
+
 * Recentf mode
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package recentf
