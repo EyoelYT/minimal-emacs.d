@@ -466,6 +466,11 @@ at the values with which this function was called."
   (setq iedit-toggle-key-default nil))
 #+end_src
 
+* Compat
+#+begin_src emacs-lisp :tangle post-init.el
+(use-package compat :ensure (:wait t))
+#+end_src
+
 * ACTV Corfu & Cape
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package corfu
