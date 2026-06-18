@@ -3918,7 +3918,8 @@ delete."
 #+begin_src emacs-lisp :tangle post-init.el
 (with-eval-after-load 'evil
   (with-eval-after-load 'magit
-    (define-key magit-status-mode-map (kbd "C-c C-p")                           'magit-section-up)
+    (define-key magit-status-mode-map   (kbd "C-c C-p")                         'magit-section-up)
+    (define-key magit-revision-mode-map (kbd "C-c C-p")                         'magit-section-up)
     (define-key magit-diff-section-map (kbd "C-<return>")                       'magit-diff-visit-file-other-window)
     (evil-define-key '(normal) magit-section-mode-map (kbd "C-<tab>")           'evil-switch-to-windows-last-buffer)
     (evil-define-key '(normal) magit-section-mode-map (kbd "<backtab>")         'magit-section-cycle)
