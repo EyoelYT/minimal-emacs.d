@@ -2426,6 +2426,52 @@ If on top of an Org link, will only copy the link component."
     (kill-new (or url (user-error "No URL at point")))
     (message "Copied link: %s" url)))
 #+end_src
+** Org Mode cycle subtree recursively
+#+begin_src emacs-lisp :tangle post-init.el
+(defun ey/org-cycle-subtree-recursively ()
+  "Old non-doom `org-cycle' TAB behavior"
+  (interactive)
+  (let ((org-cycle-tab-first-hook '(org-babel-hide-result-toggle-maybe org-babel-header-arg-expand)))
+    (org-cycle)))
+#+end_src
+
+** Org Mode link yanking and opening in another window
+#+begin_src emacs-lisp :tangle post-init.el
+(defun ey/org-id-yank-link-to-heading ()
+  "Copy an ID link with the headline to killring, if no ID is there then
+create a new unique ID. This function works only in org-mode.
+
+The purpose of this function is to easily construct id:-links to
+org-mode items. If its assigned to a key it saves you marking the text
+and copying to the killring."
+  (interactive)
+  (save-window-excursion
+    (when (eq major-mode 'org-agenda-mode)
+      (org-agenda-switch-to))
+    (when (eq major-mode 'org-mode)
+      (let* ((heading (nth 4 (org-heading-components)))
+             (id (org-id-get-create))
+             (link (format "[[id:%s][%s]]" id heading)))
+        (kill-new link)
+        (message "Copied heading link to kill-ring")))))
+
+(defun ey/org-open-at-point-other-window ()
+  "Open a new window with the same buffer and prompt for search term
+After search term is found, jump back"
+  (interactive)
+  (let ((this-buffer (buffer-name)))
+    (if (< (count-windows) 2)
+        (progn ; split and search
+          (if (> (frame-pixel-width) (/ (display-pixel-width) 2))
+              (split-window-right)
+            (split-window-below))
+          (call-interactively #'org-open-at-point))
+      (let ((point (point)))
+        (other-window 1)
+        (switch-to-buffer this-buffer)
+        (goto-char point)
+        (call-interactively #'org-open-at-point)))))
+#+end_src
 
 ** FilePath Copy
 #+begin_src emacs-lisp :tangle post-init.el
@@ -3654,6 +3700,7 @@ delete."
     (evil-define-key '(motion) org-mode-map (kbd "S-<down>") 'scroll-up-line)
     (evil-define-key '(motion) org-mode-map (kbd "S-<left>") 'evil-scroll-left)
     (evil-define-key '(motion) org-mode-map (kbd "S-<right>") 'evil-scroll-right)
+    (evil-define-key '(normal) org-mode-map (kbd "S-<tab>") 'ey/org-cycle-subtree-recursively)
     (define-key org-mode-map  (kbd "<backspace>") 'evil-delete-backward-char-and-join)
     (define-key org-src-mode-map (kbd "C-c C-c") #'org-edit-src-exit)
     (define-key org-mode-map (kbd "C-<return>")   '+org/insert-item-below)
@@ -3724,6 +3771,8 @@ delete."
     "m l i"   'org-id-store-link
     "m l l"   'org-insert-link
     "m l L"   'org-insert-all-links
+    "m l o"   'ey/org-open-at-point-other-window
+    "m l Y"   'ey/org-id-yank-link-to-heading
     "m l s"   'org-store-link
     "m l S"   'org-insert-last-stored-link
     "m l t"   'org-toggle-link-display
