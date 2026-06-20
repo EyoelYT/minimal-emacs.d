@@ -3637,9 +3637,6 @@ delete."
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package nerd-icons-ibuffer
   :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
-
-;; (use-package all-the-icons-ibuffer
-;; :hook (ibuffer-mode . all-the-icons-ibuffer-mode))
 #+end_src
 
 * Bookmarks
