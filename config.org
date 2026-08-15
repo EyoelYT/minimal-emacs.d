@@ -476,7 +476,7 @@ at the values with which this function was called."
 (use-package corfu
   :ensure t
   :defer t
-  :hook (elpaca-after-init . global-corfu-mode)
+  ;; :hook (elpaca-after-init . global-corfu-mode)
   :config
   ;; Hide commands in M-x which do not apply to the current mode.
   (setq read-extended-command-predicate #'command-completion-default-include-p)
@@ -4005,6 +4005,14 @@ delete."
  "s i" '(consult-imenu               :which-key "consult-imenu")
  "s f" '(consult-locate              :which-key "consult-locate")
  "RET" '(consult-bookmark            :which-key "consult-bookmark"))
+#+end_src
+
+** Cape Mappings
+#+begin_src emacs-lisp :tangle post-init.el
+(with-eval-after-load 'evil
+  (evil-define-key 'insert global-map (kbd "C-x C-l") 'cape-line)
+  (evil-define-key 'insert global-map (kbd "C-x C-f") 'cape-file)
+  (evil-define-key 'insert global-map (kbd "C-x C-d") 'cape-dabbrev))
 #+end_src
 
 ** Insert Bindings
