@@ -3588,6 +3588,38 @@ delete."
   )
 #+end_src
 
+* Ghostel
+#+begin_src emacs-lisp :tangle post-init.el
+(use-package ghostel
+  :ensure t
+  :hook (comint-mode . ghostel-comint-mode)
+  :init
+  ;; HACK: Done to lazy-load this package until first invocation.
+  (setq ghostel-compile-global-mode t)
+  (autoload 'ghostel-compile--compilation-start-advice "ghostel-compile")
+  (advice-add 'compilation-start :around #'ghostel-compile--compilation-start-advice)
+
+  (defun e/evil-ghostel-kill-word ()
+    (interactive)
+    (evil-ghostel-insert)
+    (ghostel-send-key "d" "meta"))
+
+  (with-eval-after-load 'evil
+    (evil-define-key 'motion ghostel-semi-char-mode-map (kbd "C-a") 'doom/backward-to-bol-or-indent)
+    (evil-define-key '(motion insert) ghostel-semi-char-mode-map (kbd "C-S-<backspace>") 'e/evil-ghostel-kill-word)))
+
+(use-package evil-ghostel
+  :ensure t
+  :hook (ghostel-mode . evil-ghostel-mode))
+
+(use-package ghostel-eshell
+  :ensure ghostel
+  :hook (eshell-load . ghostel-eshell-visual-command-mode)
+  :init
+  (with-eval-after-load 'em-term
+    (add-to-list 'eshell-visual-commands "btop" t)))
+#+end_src
+
 * Xterm Colors
 #+begin_src emacs-lisp
 ;; (use-package xterm-color
