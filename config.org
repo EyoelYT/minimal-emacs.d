@@ -3763,7 +3763,7 @@ delete."
     (evil-define-key '(normal) org-mode-map (kbd "C-S-<tab>") 'org-shifttab)
     (evil-define-key '(insert) org-mode-map (kbd "S-<left>") 'org-shiftleft)
     (evil-define-key '(insert) org-mode-map (kbd "S-<right>") 'org-shiftright)
-    (define-key org-mode-map  (kbd "<backspace>") 'evil-delete-backward-char-and-join)
+    (evil-define-key '(normal) org-mode-map (kbd "<backspace>") 'evil-delete-backward-char-and-join)
     (define-key org-src-mode-map (kbd "C-c C-c")  'org-edit-src-exit)
     (define-key org-mode-map (kbd "C-<return>")   '+org/insert-item-below)
     (define-key org-mode-map (kbd "C-S-<return>") '+org/insert-item-above)
@@ -4010,11 +4010,11 @@ delete."
 (with-eval-after-load 'evil
   (evil-define-key '(visual insert motion) global-map (kbd "C-S-a") 'ey/visual-to-last-non-blank-in-current-line)
   (evil-define-key '(visual insert motion) global-map (kbd "C-S-i") 'ey/visual-to-first-non-blank-in-current-line)
-  (evil-define-key '(visual insert motion) global-map (kbd "C-a")   'doom/backward-to-bol-or-indent) ; fixes C-a maps to `evil-paste-after'
+  (evil-define-key '(visual insert motion) global-map (kbd "C-a") 'doom/backward-to-bol-or-indent) ; fixes C-a maps to `evil-paste-after'
   (evil-define-key '(visual insert motion normal) global-map (kbd "C-p") 'ey/compile)
-  (evil-define-key '(visual insert motion) global-map (kbd "C-S-p") 'project-compile)
-  (define-key global-map (kbd "<backspace>")                        'evil-delete-backward-char-and-join)
-  (define-key evil-normal-state-map (kbd "C-.")                     'delete-other-windows))
+  (evil-define-key '(visual insert motion normal) global-map (kbd "C-S-p") 'project-compile)
+  (evil-define-key '(normal) global-map (kbd "DEL") 'evil-delete-backward-char-and-join)
+  (define-key evil-normal-state-map (kbd "C-.") 'delete-other-windows))
 #+end_src
 
 ** File Bindings
