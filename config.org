@@ -4008,7 +4008,9 @@ delete."
   (evil-define-key '(visual insert motion normal) global-map (kbd "C-p") 'ey/compile)
   (evil-define-key '(visual insert motion normal) global-map (kbd "C-S-p") 'project-compile)
   (evil-define-key '(normal) global-map (kbd "DEL") 'evil-delete-backward-char-and-join)
-  (define-key evil-normal-state-map (kbd "C-.") 'delete-other-windows))
+  (define-key evil-normal-state-map (kbd "C-.") 'delete-other-windows)
+  (define-key evil-insert-state-map (kbd "S-RET") 'electric-newline-and-maybe-indent)
+  (define-key evil-insert-state-map (kbd "S-<return>") 'electric-newline-and-maybe-indent))
 #+end_src
 
 ** File Bindings
