@@ -902,7 +902,7 @@ at the values with which this function was called."
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package diff-hl
   :ensure (:host github :repo "dgutov/diff-hl")
-  ;; :hook (elpaca-after-init . global-diff-hl-mode)
+  :hook (elpaca-after-init . global-diff-hl-mode)
   :hook (diff-hl-mode . diff-hl-flydiff-mode)
   :commands diff-hl-stage-current-hunk diff-hl-revert-hunk diff-hl-next-hunk diff-hl-previous-hunk diff-hl-bmp-max-width
   :config
@@ -1014,7 +1014,30 @@ of the fringe.  When the fringe is hidden, this value is also used."
   ;;         ;; A non-descript, left-pointing arrow
   ;;         (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
   ;;           [16 48 112 240 112 48 16] nil nil 'center))
-  )
+
+  (defun +diff-hl-redefine-broken-bitmaps ()
+    "Use this to redefine thin bitmaps when they are broken due to text
+scaling"
+    (interactive)
+    (let* ((scale (if (and (boundp 'text-scale-mode-amount)
+                           (numberp text-scale-mode-amount))
+                      (expt text-scale-mode-step text-scale-mode-amount)
+                    1))
+           (spacing (or (and (display-graphic-p) (default-value 'line-spacing)) 0))
+           (h (+ (ceiling (* (frame-char-height) scale))
+                 (if (floatp spacing)
+                     (truncate (* (frame-char-height) spacing))
+                   spacing)))
+           (w (min (frame-parameter nil (intern (format "%s-fringe" diff-hl-side)))
+                   diff-hl-bmp-max-width))
+           (_ (if (zerop w) (setq w diff-hl-bmp-max-width))))
+      (define-fringe-bitmap 'diff-hl-bmp-middle
+        (make-vector
+         h (string-to-number (let ((half-w (1- (/ w 2))))
+                               (concat (make-string half-w ?1)
+                                       (make-string (- w half-w) ?0)))
+                             2))
+        nil nil 'center))))
 #+end_src
 
 * Diff Views
