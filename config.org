@@ -391,7 +391,10 @@ at the values with which this function was called."
   :init
   (setq evil-collection-want-unimpaired-p nil)
   :config
-  (setq evil-collection-want-find-usages-bindings t))
+  (setq evil-collection-want-find-usages-bindings t)
+  (setq evil-collection-binding-overrides
+        '((repl-submit :enabled nil)
+          (repl-newline :enabled nil))))
 
 ;; (use-package evil-tutor)
 
