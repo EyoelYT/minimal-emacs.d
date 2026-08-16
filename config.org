@@ -1445,13 +1445,7 @@ Else do `vertico-exit'."
 
 * Set Theme
 #+begin_src emacs-lisp :tangle post-init.el
-(load-theme 'doom-tomorrow-night t)
-;; (load-theme 'doom-one t)
-;; (load-theme 'ef-summer :no-confirm)
-;; (load-theme 'ef-owl :no-confirm)
-;; (load-theme 'leuven :no-confirm)
-;; (load-theme 'doom-badger :no-confirm)
-;; (consult-theme 'leuven)
+(load-theme 'modus-vivendi t)
 #+end_src
 
 * Consult
