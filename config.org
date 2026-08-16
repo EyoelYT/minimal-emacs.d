@@ -1810,6 +1810,16 @@ Else do `vertico-exit'."
   :hook (markdown-mode . markdown-indent-mode))
 #+end_src
 
+* Uniline
+#+begin_src emacs-lisp :tangle post-init.el
+(use-package uniline
+  :ensure t
+  :commands uniline-mode)
+
+(use-package uniline-transient
+  :ensure uniline)
+#+end_src
+
 * Drag Stuff
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package drag-stuff
