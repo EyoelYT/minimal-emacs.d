@@ -2793,6 +2793,17 @@ conduct a text search from the current directory"
   (if (project-current)
       (consult-ripgrep (project-root (project-current)))
     (ey/consult-ripgrep-cwd)))
+
+(defun ey/consult-search-other-project (&optional arg)
+  "Conduct a text search from the root of the selected project in the
+completing read. If not in a project, conduct a text search from the
+current directory"
+  (interactive "P")
+  (let ((projects (project-known-project-roots)))
+    (if projects
+        (let* ((project-dir (completing-read "Search in project: " projects nil t)))
+          (consult-ripgrep project-dir))
+      (user-error "There are no known projects"))))
 #+end_src
 
 ** Backward to first non blank || beg of line (stolen from doom emacs)
@@ -3957,6 +3968,7 @@ delete."
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
  "/"   '(ey/consult-search-project       :which-key "project-consult-ripgrep")
+ "?"   '(ey/consult-search-other-project :which-key "consult-ripgrep-other-project")
  "SPC" '(project-find-file               :which-key "project-find-file")
  "p p" '(project-switch-project          :which-key "project-switch-project")
  "p t" '(magit-todos-list                :which-key "List project todos")
