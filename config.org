@@ -3080,6 +3080,33 @@ See minad/consult#770."
       (consult-find default-directory initial-input))))
 #+end_src
 
+** Yank/Copy buffer file name
+#+begin_src emacs-lisp :tangle post-init.el
+(defun +default/yank-buffer-path (&optional root)
+  "Copy the current buffer's path to the kill ring."
+  (interactive)
+  (if-let* ((filename (or (buffer-file-name (buffer-base-buffer))
+                          (bound-and-true-p list-buffers-directory))))
+      (let ((path (abbreviate-file-name
+                   (if root
+                       (file-relative-name filename root)
+                     filename))))
+        (kill-new path)
+        (if (string= path (car kill-ring))
+            (message "Copied path: %s" path)
+          (user-error "Couldn't copy filename in current buffer")))
+    (error "Couldn't find filename in current buffer")))
+
+(defun +default/yank-buffer-path-relative-to-project (&optional include-root)
+  "Copy the current buffer's path to the kill ring.
+With non-nil prefix INCLUDE-ROOT, also include the project's root."
+  (interactive "P")
+  (+default/yank-buffer-path
+   (if include-root
+       (file-name-directory (directory-file-name (project-root (project-current))))
+     (project-root (project-current)))))
+#+end_src
+
 * Pespectives [No Tangle]
 #+begin_src emacs-lisp
 ;; (use-package perspective
@@ -4146,6 +4173,8 @@ delete."
  "s M" '(global-hide-mode-line-mode                :which-key "toggle modeline visibility")
  "f o" '(ey/find-file-under-selection-other-window :which-key "ey/find-file-under-selection")
  "r g" '(ey/consult-ripgrep-cwd                    :which-key "ey/consult-ripgrep-cwd")
+ "f y" '(+default/yank-buffer-path                 :which-key "+default/yank-buffer-path")
+ "f Y" '(+default/yank-buffer-path-relative-to-project :which-key "+default/yank-buffer-path-relative-to-project")
  "f d" '(ey/consult-fd-or-find                     :which-key "ey/consult-fd-or-find"))
 #+end_src
 
