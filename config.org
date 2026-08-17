@@ -915,6 +915,23 @@ root."
             (magit-log-setup-buffer nil '("--branches" "--remotes" "--graph" "--color" "-n256" "--decorate") nil))
         (user-error "There are no known projects")))))
 
+(use-package magit-delta
+  :ensure t
+  :defer t)
+
+(use-package git-commit
+  :ensure magit
+  :hook (elpaca-after-init . global-git-commit-mode)
+  :config
+  (defun +vc-start-in-insert-state-maybe-h ()
+    "Start git-commit-mode in insert state if in a blank commit message,
+otherwise in default state."
+    (when (and (bound-and-true-p evil-local-mode)
+               (not (evil-emacs-state-p))
+               (bobp) (eolp))
+      (evil-insert-state)))
+  (add-hook 'git-commit-setup-hook #'+vc-start-in-insert-state-maybe-h))
+
 ;; NOTE: Make sure to configure a GitHub token before using this package!
 ;; - https://magit.vc/manual/forge/Token-Creation.html#Token-Creation
 ;; - https://magit.vc/manual/ghub/Getting-Started.html#Getting-Started
