@@ -4070,7 +4070,7 @@ delete."
  "'" '(vertico-repeat-select  :which-key "vertico search history"))
 (with-eval-after-load 'vertico
   (define-key vertico-map (kbd "C-SPC") '+vertico/embark-preview)
-  (define-key vertico-map [remap evil-delete-backward-char-and-join]  'vertico-directory-delete-char))
+  (evil-define-key '(insert) vertico-map (kbd "DEL") 'vertico-directory-delete-char))
 (with-eval-after-load 'vertico-flat
   (define-key vertico-flat-map [remap left-char] 'left-char)
   (define-key vertico-flat-map [remap right-char] 'right-char))
