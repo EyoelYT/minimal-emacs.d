@@ -889,7 +889,31 @@ at the values with which this function was called."
   (setq magit-diff-refine-hunk t)
   (setq magit-save-repository-buffers nil)
   ;; (setq magit-revision-insert-related-refs nil)
-  (add-hook 'magit-process-mode-hook #'goto-address-mode))
+  (add-hook 'magit-process-mode-hook #'goto-address-mode)
+
+  (defun magit-project-status ()
+    "Prompt to select a project using project.el, then run `magit-status' in
+its root."
+    (interactive)
+    (let ((projects (project-known-project-roots)))
+      (if projects
+          (let* ((project-dir (completing-read "Switch to project: " projects nil t))
+                 (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+            (magit-status-setup-buffer project-dir))
+        (user-error "There are no known projects"))))
+
+  (defun magit-project-log-all-branches ()
+    "Prompt to select a project, then run `magit-log-all` in that project's
+root."
+    (interactive)
+    (let ((projects (project-known-project-roots)))
+      (if projects
+          (let* ((project (completing-read "Switch to project: " projects))
+                 (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
+                 (default-directory project))
+            ;; magit-log-setup-buffer sets up the log view natively in the default-directory
+            (magit-log-setup-buffer nil '("--branches" "--remotes" "--graph" "--color" "-n256" "--decorate") nil))
+        (user-error "There are no known projects")))))
 
 ;; NOTE: Make sure to configure a GitHub token before using this package!
 ;; - https://magit.vc/manual/forge/Token-Creation.html#Token-Creation
@@ -3899,7 +3923,7 @@ delete."
  "p F" '(project-or-external-find-file   :which-key "project-or-external-find-file")
  "p s" '(project-find-regexp             :which-key "project-find-regexp")
  "p S" '(project-or-external-find-regexp :which-key "project-or-external-find-regexp")
- "p l" '(project-list-buffers            :which-key "project-list-buffers")
+ "p L" '(project-list-buffers            :which-key "project-list-buffers")
  "p R" '(project-query-replace-regexp    :which-key "project-query-replace-regexp")
  "p k" '(project-kill-buffers            :which-key "project-kill-buffers"))
 #+end_src
@@ -4264,13 +4288,17 @@ delete."
 ** Version Control Mappings
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
- "g g" '(magit-status               :which-key "magit-status")
- "g G" '(magit-status-here          :which-key "magit-status-here")
- "g b" '(magit-branch-checkout      :which-key "magit-branch-checkout")
- "g /" '(magit-dispatch             :which-key "magit-dispatch")
- "g =" '(diff-hl-show-hunk          :which-key "diff-hl-show-hunk")
- "g s" '(diff-hl-stage-current-hunk :which-key "diff-hl-stage-current-hunk")
- "g d" '(diff-hl-revert-hunk        :which-key "diff-hl-revert-hunk"))
+ "g g" '(magit-status                   :which-key "magit-status")
+ "g G" '(magit-status-here              :which-key "magit-status-here")
+ "g b" '(magit-branch-checkout          :which-key "magit-branch-checkout")
+ "g /" '(magit-dispatch                 :which-key "magit-dispatch")
+ "g L" '(magit-log-buffer-file          :which-key "magit-log-buffer-file")
+ "g l" '(magit-log-all-branches         :which-key "magit-log-all-branches")
+ "p m" '(magit-project-status           :which-key "magit-project-status")
+ "p l" '(magit-project-log-all-branches :which-key "magit-project-log-all-branches")
+ "g =" '(diff-hl-show-hunk              :which-key "diff-hl-show-hunk")
+ "g s" '(diff-hl-stage-current-hunk     :which-key "diff-hl-stage-current-hunk")
+ "g d" '(diff-hl-revert-hunk            :which-key "diff-hl-revert-hunk"))
 #+end_src
 
 * Runtime Performance (Control when garbage collection occurs)
