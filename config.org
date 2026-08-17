@@ -3838,6 +3838,7 @@ delete."
     (evil-define-key '(insert) org-mode-map (kbd "S-<right>") 'org-shiftright)
     (evil-define-key '(normal) org-mode-map (kbd "<backspace>") 'evil-delete-backward-char-and-join)
     (define-key org-src-mode-map (kbd "C-c C-c")  'org-edit-src-exit)
+    (define-key org-mode-map (kbd "C-c C-'")  'org-edit-special)
     (define-key org-mode-map (kbd "C-<return>")   '+org/insert-item-below)
     (define-key org-mode-map (kbd "C-S-<return>") '+org/insert-item-above)
     (define-key org-mode-map [C-return]   '+org/insert-item-below)
