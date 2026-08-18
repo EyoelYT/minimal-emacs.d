@@ -4165,16 +4165,18 @@ delete."
 ** Consult Mappings
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
- "h t" '(consult-theme               :which-key "consult-theme")
- "hdd" '(toggle-debug-on-error       :which-key "debug-mode")
- "s r" '(consult-mark                :which-key "consult-mark")
- "i r" '(consult-register            :which-key "consult-register")
- "f r" '(consult-recent-file         :which-key "consult-recent-file")
- "i s" '(consult-yasnippet           :which-key "consult-yasnippet")
- "i y" '(consult-yank-from-kill-ring :which-key "consult-yank-from-kill-ring")
- "s i" '(consult-imenu               :which-key "consult-imenu")
- "s f" '(consult-locate              :which-key "consult-locate")
- "RET" '(consult-bookmark            :which-key "consult-bookmark"))
+  "h t" '(consult-theme                   :which-key "consult-theme")
+  "hdd" '(toggle-debug-on-error           :which-key "debug-mode")
+  "s r" '(consult-mark                    :which-key "consult-mark")
+  "i r" '(consult-register                :which-key "consult-register")
+  "f r" '(consult-recent-file             :which-key "consult-recent-file")
+  "i s" '(consult-yasnippet               :which-key "consult-yasnippet")
+  "i y" '(consult-yank-from-kill-ring     :which-key "consult-yank-from-kill-ring")
+  "s i" '(consult-imenu                   :which-key "consult-imenu")
+  "s f" '(consult-locate                  :which-key "consult-locate")
+  "s p" '(ey/consult-search-project       :which-key "ey/consult-search-project")
+  "s P" '(ey/consult-search-other-project :which-key "ey/consult-search-project")
+  "RET" '(consult-bookmark                :which-key "consult-bookmark"))
 #+end_src
 
 ** Cape Mappings
