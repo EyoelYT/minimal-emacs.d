@@ -2754,6 +2754,26 @@ is non-nil, move the window to the other end of the frame. Inverts
 (advice-add 'evil-delete-backward-char-and-join :before #'ey/evil-do-insert-state--advice)
 #+end_src
 
+** PP Eval Region                                                      :ppr:
+#+begin_src emacs-lisp :tangle post-init.el
+(defun pp-eval-expression-with-region (expression &optional insert-value)
+  "Evaluate EXPRESSION and pretty-print its value.
+Also add the value to the front of the list in the variable `values'."
+  (interactive
+   (let ((selection
+          (if (region-active-p)
+              (buffer-substring-no-properties (region-beginning) (region-end))
+            nil)))
+     (list (read--expression "PP Eval: " selection) current-prefix-arg)))
+  (message "Evaluating...")
+  (let ((result (eval expression lexical-binding)))
+    ;; (values--store-value result) ; skip storing value in value ... not needed
+    (if insert-value
+        (let (deactivate-mark)
+          (insert (pp-to-string result)))
+      (pp-display-expression result "*Pp Eval Output*" pp-use-max-width))))
+#+end_src
+
 ** Search Buffer (with consult)
 #+begin_src emacs-lisp :tangle post-init.el
 (defun +default/search-buffer ()
@@ -4085,6 +4105,7 @@ delete."
 (global-set-key (kbd "M-c") 'capitalize-dwim)
 (global-set-key (kbd "M-U") 'downcase-dwim)
 (global-set-key (kbd "M-C") 'downcase-dwim)
+(global-set-key (kbd "M-:") 'pp-eval-expression-with-region)
 
 (with-eval-after-load 'evil
   (evil-define-key '(visual insert motion) global-map (kbd "C-S-a") 'ey/visual-to-last-non-blank-in-current-line)
