@@ -2790,19 +2790,23 @@ input and search the whole buffer for it."
   "Conduct a text search in the current project root. If not in a project,
 conduct a text search from the current directory"
   (interactive "P")
-  (if (project-current)
-      (consult-ripgrep (project-root (project-current)))
-    (ey/consult-ripgrep-cwd)))
+  (let ((selected-text (when (region-active-p)
+                         (buffer-substring-no-properties (region-beginning) (region-end)))))
+    (if (project-current)
+        (consult-ripgrep (project-root (project-current)) selected-text)
+      (ey/consult-ripgrep-cwd))))
 
 (defun ey/consult-search-other-project (&optional arg)
   "Conduct a text search from the root of the selected project in the
 completing read. If not in a project, conduct a text search from the
 current directory"
   (interactive "P")
-  (let ((projects (project-known-project-roots)))
+  (let* ((selected-text (when (region-active-p)
+                          (buffer-substring-no-properties (region-beginning) (region-end))))
+         (projects (project-known-project-roots)))
     (if projects
-        (let* ((project-dir (completing-read "Search in project: " projects nil t)))
-          (consult-ripgrep project-dir))
+        (let ((project-dir (completing-read "Search in project: " projects nil t)))
+          (consult-ripgrep project-dir selected-text))
       (user-error "There are no known projects"))))
 #+end_src
 
