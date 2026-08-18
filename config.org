@@ -878,18 +878,35 @@ at the values with which this function was called."
 (use-package transient
   :defer t
   :ensure (:wait t))
-#+end_src
-#+begin_src emacs-lisp :tangle post-init.el
+
 (use-package magit
   :init (setq magit-auto-revert-mode nil)
   :commands magit-status magit-file-delete
   :config
-  (setq magit-display-buffer-function
-        #'magit-display-buffer-same-window-except-diff-v1)
+  (setq magit-display-buffer-function #'ey/magit-display-buffer-fn)
   (setq magit-diff-refine-hunk t)
   (setq magit-save-repository-buffers nil)
   ;; (setq magit-revision-insert-related-refs nil)
   (add-hook 'magit-process-mode-hook #'goto-address-mode)
+
+  (defun ey/magit-display-buffer-fn (buffer)
+    "Display BUFFER in the selected window, except...
+- If opened from a commit window, it will open below it.
+- If a buffer's `major-mode' derives from `magit-diff-mode' or
+  `magit-process-mode', display it in another window."
+    (let ((buffer-mode (buffer-local-value 'major-mode buffer)))
+      (display-buffer
+       buffer
+       (cond
+        ((or (bound-and-true-p git-commit-mode)
+             (eq buffer-mode 'magit-process-mode))
+         (let ((size (if (eq buffer-mode 'magit-process-mode) 0.5 0.7)))
+           `(display-buffer-below-selected
+             . ((window-height . ,(truncate (* (window-height) size)))))))
+        ((with-current-buffer buffer
+           (derived-mode-p (list 'magit-diff-mode 'magit-process-mode)))
+         '(nil (inhibit-same-window . t)))
+        ('(display-buffer-same-window))))))
 
   (defun magit-project-status ()
     "Prompt to select a project using project.el, then run `magit-status' in
