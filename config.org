@@ -1580,10 +1580,6 @@ Else do `vertico-exit'."
   ;; ("M-r" . consult-history)                 ;; orig. previous-matching-history-element
   ;; )
 
-  ;; Enable automatic preview at point in the *Completions* buffer. This is
-  ;; relevant when you use the default completion UI.
-  :hook (completion-list-mode . consult-preview-at-point-mode)
-
   ;; The :init configuration is always executed (Not lazy)
   :init
 
@@ -1698,8 +1694,7 @@ Else do `vertico-exit'."
 
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
-  :hook
-  (embark-collect-mode . consult-preview-at-point-mode))
+  :ensure embark)
 #+end_src
 
 * Hl-TODO
