@@ -384,7 +384,19 @@ at the values with which this function was called."
   (evil-set-initial-state 'shell-command-mode 'normal)
   (evil-set-initial-state 'minibuffer-mode 'insert)
   (setq evil-insert-state-cursor 'box)
-  (setq evil-echo-state nil))
+  (setq evil-echo-state nil)
+
+  (defun ey/evil-search-next-forward (&optional count)
+    "n always searches forward, regardless of last search direction."
+    (interactive "p")
+    (let ((evil-ex-search-direction 'forward))
+      (evil-ex-search-next count)))
+
+  (defun ey/evil-search-next-backward (&optional count)
+    "N always searches backward, regardless of last search direction."
+    (interactive "p")
+    (let ((evil-ex-search-direction 'backward))
+      (evil-ex-search-next count))))
 
 (use-package evil-collection
   :hook (evil-mode . evil-collection-init)
@@ -3837,6 +3849,11 @@ delete."
 ** Evil Keybinds
 #+begin_src emacs-lisp :tangle post-init.el
 (with-eval-after-load 'evil
+  (define-key evil-normal-state-map (kbd "n") #'ey/evil-search-next-forward)
+  (define-key evil-normal-state-map (kbd "N") #'ey/evil-search-next-backward)
+  (define-key evil-motion-state-map (kbd "n") #'ey/evil-search-next-forward)
+  (define-key evil-motion-state-map (kbd "N") #'ey/evil-search-next-backward)
+
   (evil-define-key 'insert global-map       [remap newline]    'newline-and-indent)
   (evil-define-key 'insert global-map       (kbd "C-e")        'doom/forward-to-last-non-comment-or-eol)
   (evil-define-key 'normal ibuffer-mode-map (kbd "S-<return>") 'ibuffer-visit-buffer-other-window)
