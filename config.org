@@ -1874,6 +1874,16 @@ Else do `vertico-exit'."
   :ensure uniline)
 #+end_src
 
+* kkp
+#+begin_src emacs-lisp :tangle post-init.el
+(use-package kkp
+  :ensure t
+  :hook (tty-setup . global-kkp-mode)
+  :init
+  ;; For C-g aborting blocking subprocesses
+  (setq kkp-restore-legacy-keys-around-subprocesses t))
+#+end_src
+
 * Drag Stuff
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package drag-stuff
