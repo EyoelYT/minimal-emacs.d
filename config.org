@@ -4176,6 +4176,8 @@ delete."
  "'" '(vertico-repeat-select  :which-key "vertico search history"))
 (with-eval-after-load 'vertico
   (define-key vertico-map (kbd "C-SPC") '+vertico/embark-preview)
+  (evil-define-key '(insert motion) vertico-map (kbd "C-u") 'vertico-scroll-down)
+  (evil-define-key '(insert motion) vertico-map (kbd "C-d") 'vertico-scroll-up)
   (evil-define-key '(insert) vertico-map (kbd "DEL") 'vertico-directory-delete-char))
 (with-eval-after-load 'vertico-flat
   (define-key vertico-flat-map [remap left-char] 'left-char)
