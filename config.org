@@ -4316,6 +4316,9 @@ delete."
 (define-leader-keys
  "a"     '(embark-act      :which-key "embark-act")
  "h b b" '(embark-bindings :which-key "embark-bindings"))
+
+(with-eval-after-load 'embark
+  (define-key embark-buffer-map "s" #'save-buffer))
 #+end_src
 
 ** Window Control
