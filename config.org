@@ -4167,6 +4167,7 @@ delete."
   (with-eval-after-load 'magit
     (define-key magit-status-mode-map   (kbd "C-c C-p")                         'magit-section-up)
     (define-key magit-revision-mode-map (kbd "C-c C-p")                         'magit-section-up)
+    (define-key magit-diff-mode-map    (kbd "C-c C-p")                          'magit-section-up)
     (define-key magit-diff-section-map (kbd "C-<return>")                       'magit-diff-visit-file-other-window)
     (evil-define-key '(normal) magit-section-mode-map (kbd "C-<tab>")           'evil-switch-to-windows-last-buffer)
     (evil-define-key '(normal) magit-section-mode-map (kbd "<backtab>")         'magit-section-cycle)
