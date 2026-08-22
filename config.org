@@ -4185,7 +4185,15 @@ delete."
   (define-key magit-diff-mode-map     (kbd "C-c C-p")                         'magit-section-up)
   (define-key magit-diff-section-map  (kbd "C-<return>")                      'magit-diff-visit-file-other-window)
   (define-key magit-section-mode-map  (kbd "<backtab>")                       'magit-section-cycle)
+  (define-key magit-section-mode-map  (kbd "M-1")                              nil) ; remove bindings to give way to tab-bar-mode bindings M-<digit>
+  (define-key magit-section-mode-map  (kbd "M-2")                              nil)
+  (define-key magit-section-mode-map  (kbd "M-3")                              nil)
+  (define-key magit-section-mode-map  (kbd "M-4")                              nil)
   (with-eval-after-load 'evil
+    (evil-define-key '(normal) magit-section-mode-map (kbd "M-1")              nil)
+    (evil-define-key '(normal) magit-section-mode-map (kbd "M-2")              nil)
+    (evil-define-key '(normal) magit-section-mode-map (kbd "M-3")              nil)
+    (evil-define-key '(normal) magit-section-mode-map (kbd "M-4")              nil)
     (evil-define-key '(normal) magit-section-mode-map (kbd "C-S-<tab>")       'magit-section-cycle-global)
     (evil-define-key '(normal) magit-section-mode-map (kbd "S-<tab>")         'magit-section-cycle)
     (evil-define-key '(normal) magit-section-mode-map (kbd "C-<tab>")         'evil-switch-to-windows-last-buffer)
