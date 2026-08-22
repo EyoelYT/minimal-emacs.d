@@ -3891,6 +3891,12 @@ delete."
     (evil-define-key '(normal visual) evil-multiedit-mode-map (kbd "<return>") 'evil-multiedit-toggle-or-restrict-region)))
 #+end_src
 
+** Comint Mode Mappings
+#+begin_src emacs-lisp :tangle post-init.el
+(with-eval-after-load 'evil
+  (evil-define-key 'normal comint-mode-map (kbd "C-p") 'ey/compile))
+#+end_src
+
 ** Org Mappings
 #+begin_src emacs-lisp :tangle post-init.el
 (with-eval-after-load 'evil
