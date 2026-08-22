@@ -1941,6 +1941,22 @@ Else do `vertico-exit'."
   (setq magit-refresh-verbose nil
         garbage-collection-messages nil))
 #+end_src
+
+** Profiler
+#+begin_src emacs-lisp :tangle post-init.el
+(defvar profiler--on nil)
+(defun toggle-profiler ()
+  "Toggle the Emacs profiler. Run it again to see the profiling report.
+Prefix arg to do cpu+mem. Default runs cpu profiler."
+  (interactive)
+  (cond ((not profiler--on)
+         (profiler-start 'cpu+mem))
+        (t
+         (profiler-stop)
+         (profiler-report)))
+  (setq profiler--on (not profiler--on)))
+#+end_src
+
 ** Set Jump
 #+begin_src emacs-lisp :tangle post-init.el
 (defun doom-set-jump-a (fn &rest args)
