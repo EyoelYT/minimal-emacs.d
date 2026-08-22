@@ -3771,7 +3771,7 @@ delete."
     (evil-define-key '(motion insert) ghostel-semi-char-mode-map (kbd "C-S-<backspace>") 'e/evil-ghostel-kill-word)))
 
 (use-package evil-ghostel
-  :ensure t
+  :ensure ghostel
   :hook (ghostel-mode . evil-ghostel-mode))
 
 (use-package ghostel-eshell
