@@ -1758,17 +1758,6 @@ Else do `vertico-exit'."
     (tab-bar-switch-to-tab (cdr (cadr (tab-bar--current-tab-find)))))
 
   (define-leader-keys
-   "v"           '(                           :wk "tab-bar" :ignore t)
-   "v ."         '(tab-bar-select-tab-by-name :wk "select tab by name")
-   "v v"         '(+tab-bar-show-tabs         :wk "show tabs")
-   "v N"         '(+tab-bar-new-named-tab     :wk "new named tab")
-   "v n"         '(tab-bar-new-tab            :wk "new tab")
-   "v r"         '(tab-bar-rename-tab         :wk "rename tab")
-   "v d"         '(tab-bar-close-tab          :wk "close tab")
-   "v S-<right>" '(tab-bar-move-tab           :wk "move tab right")
-   "v S-<left>"  '(tab-bar-move-tab-backward  :wk "move tab left"))
-
-  (define-leader-keys
    "TAB"           '(                           :wk "tab-bar" :ignore t)
    "TAB ."         '(tab-bar-select-tab-by-name :wk "select tab by name")
    "TAB TAB"       '(+tab-bar-show-tabs         :wk "show tabs")
@@ -1777,7 +1766,17 @@ Else do `vertico-exit'."
    "TAB r"         '(tab-bar-rename-tab         :wk "rename tab")
    "TAB d"         '(tab-bar-close-tab          :wk "close tab")
    "TAB S-<right>" '(tab-bar-move-tab           :wk "move tab right")
-   "TAB S-<left>"  '(tab-bar-move-tab-backward  :wk "move tab left")))
+   "TAB S-<left>"  '(tab-bar-move-tab-backward  :wk "move tab left")
+   "TAB <left>"    '(tab-bar-switch-to-prev-tab :wk "tab bar switch to prev tab")
+   "TAB <right>"   '(tab-bar-switch-to-next-tab :wk "tab bar switch to next tab")
+   "1"             '(tab-bar-select-tab         :wk "tab bar select tab")
+   "2"             '(tab-bar-select-tab         :wk "tab bar select tab")
+   "3"             '(tab-bar-select-tab         :wk "tab bar select tab")
+   "4"             '(tab-bar-select-tab         :wk "tab bar select tab")
+   "5"             '(tab-bar-select-tab         :wk "tab bar select tab")
+   "6"             '(tab-bar-select-tab         :wk "tab bar select tab")
+   "7"             '(tab-bar-select-tab         :wk "tab bar select tab")
+   "8"             '(tab-bar-select-tab         :wk "tab bar select tab")))
 
 (use-package tab-bar-echo-area
   :ensure t
