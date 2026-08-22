@@ -4163,19 +4163,22 @@ delete."
 
 ** Magit Bindings
 #+begin_src emacs-lisp :tangle post-init.el
-(with-eval-after-load 'evil
-  (with-eval-after-load 'magit
-    (define-key magit-status-mode-map   (kbd "C-c C-p")                         'magit-section-up)
-    (define-key magit-revision-mode-map (kbd "C-c C-p")                         'magit-section-up)
-    (define-key magit-diff-mode-map    (kbd "C-c C-p")                          'magit-section-up)
-    (define-key magit-diff-section-map (kbd "C-<return>")                       'magit-diff-visit-file-other-window)
-    (evil-define-key '(normal) magit-section-mode-map (kbd "C-<tab>")           'evil-switch-to-windows-last-buffer)
-    (evil-define-key '(normal) magit-section-mode-map (kbd "<backtab>")         'magit-section-cycle)
-    (evil-define-key '(normal) magit-section-mode-map (kbd "C-S-<down>")        'magit-section-forward)
-    (evil-define-key '(normal) magit-section-mode-map (kbd "C-S-<up>")          'magit-section-backward)
-    (evil-define-key '(normal) magit-section-mode-map (kbd "M-RET")             'magit-diff-visit-worktree-file-other-window)
-    (evil-define-key '(normal) magit-section-mode-map (kbd "S-<return>")        'magit-diff-visit-worktree-file-other-window)
-    (evil-define-key '(normal visual) magit-mode-map "zz"                       'evil-scroll-line-to-center)))
+(with-eval-after-load 'magit
+  (define-key magit-status-mode-map   (kbd "C-c C-p")                         'magit-section-up)
+  (define-key magit-revision-mode-map (kbd "C-c C-p")                         'magit-section-up)
+  (define-key magit-diff-mode-map     (kbd "C-c C-p")                         'magit-section-up)
+  (define-key magit-diff-section-map  (kbd "C-<return>")                      'magit-diff-visit-file-other-window)
+  (define-key magit-section-mode-map  (kbd "<backtab>")                       'magit-section-cycle)
+  (with-eval-after-load 'evil
+    (evil-define-key '(normal) magit-section-mode-map (kbd "C-S-<tab>")       'magit-section-cycle-global)
+    (evil-define-key '(normal) magit-section-mode-map (kbd "S-<tab>")         'magit-section-cycle)
+    (evil-define-key '(normal) magit-section-mode-map (kbd "C-<tab>")         'evil-switch-to-windows-last-buffer)
+    (evil-define-key '(normal) magit-section-mode-map (kbd "<backtab>")       'magit-section-cycle)
+    (evil-define-key '(normal) magit-section-mode-map (kbd "C-S-<down>")      'magit-section-forward)
+    (evil-define-key '(normal) magit-section-mode-map (kbd "C-S-<up>")        'magit-section-backward)
+    (evil-define-key '(normal) magit-section-mode-map (kbd "M-RET")           'magit-diff-visit-worktree-file-other-window)
+    (evil-define-key '(normal) magit-section-mode-map (kbd "S-<return>")      'magit-diff-visit-worktree-file-other-window)
+    (evil-define-key '(normal visual) magit-mode-map "zz"                     'evil-scroll-line-to-center)))
 
 (with-eval-after-load 'transient
   (define-key transient-map (kbd "<escape>") 'transient-quit-one))
