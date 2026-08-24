@@ -918,31 +918,7 @@ at the values with which this function was called."
         ((with-current-buffer buffer
            (derived-mode-p (list 'magit-diff-mode 'magit-process-mode)))
          '(nil (inhibit-same-window . t)))
-        ('(display-buffer-same-window))))))
-
-  (defun magit-project-status ()
-    "Prompt to select a project using project.el, then run `magit-status' in
-its root."
-    (interactive)
-    (let ((projects (project-known-project-roots)))
-      (if projects
-          (let* ((project-dir (completing-read "Switch to project: " projects nil t))
-                 (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
-            (magit-status-setup-buffer project-dir))
-        (user-error "There are no known projects"))))
-
-  (defun magit-project-log-all-branches ()
-    "Prompt to select a project, then run `magit-log-all` in that project's
-root."
-    (interactive)
-    (let ((projects (project-known-project-roots)))
-      (if projects
-          (let* ((project (completing-read "Switch to project: " projects))
-                 (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
-                 (default-directory project))
-            ;; magit-log-setup-buffer sets up the log view natively in the default-directory
-            (magit-log-setup-buffer nil '("--branches" "--remotes" "--graph" "--color" "-n256" "--decorate") nil))
-        (user-error "There are no known projects")))))
+        ('(display-buffer-same-window)))))))
 
 (use-package magit-delta
   :ensure t
@@ -2598,6 +2574,34 @@ After search term is found, jump back"
             (message "Copied path: %s" path)
           (user-error "Couldn't copy filename in current buffer")))
     (error "Couldn't find filename in current buffer")))
+#+end_src
+
+** Magit Project Functions
+#+begin_src emacs-lisp :tangle post-init.el
+(defun magit-project-status ()
+  "Prompt to select a project using project.el, then run `magit-status' in
+its root."
+  (interactive)
+  (let ((projects (project-known-project-roots)))
+    (if projects
+        (let* ((project-dir (completing-read "Switch to project: " projects nil t))
+               (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+          (magit-status-setup-buffer project-dir))
+      (user-error "There are no known projects"))))
+
+(defun magit-project-log-all-branches ()
+  "Prompt to select a project, then run `magit-log-all` in that project's
+root."
+  (interactive)
+  (let ((projects (project-known-project-roots)))
+    (if projects
+        (let* ((project (completing-read "Switch to project: " projects))
+               (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
+               (default-directory project))
+          ;; magit-log-setup-buffer sets up the log view natively in the default-directory
+          (require 'magit-log)
+          (magit-log-setup-buffer nil '("--branches" "--remotes" "--graph" "--color" "-n256" "--decorate") nil))
+      (user-error "There are no known projects"))))
 #+end_src
 
 ** Escape Key
