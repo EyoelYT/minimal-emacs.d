@@ -1595,6 +1595,60 @@ Else do `vertico-exit'."
   ;; Both < and C-+ work reasonably well.
   (setq consult-narrow-key "C-+") ;; "<"
 
+  (defvar consult-source-dired-buffer
+    `( :name     "Dired Buffer"
+       :narrow   ?d
+       :hidden   t
+       :category buffer
+       :face     consult-buffer
+       :history  buffer-name-history
+       :state    ,#'consult--buffer-state
+       :items
+       ,(lambda () (consult--buffer-query :sort 'visibility
+                                          :as #'consult--buffer-pair
+                                          :predicate
+                                          (lambda (buf)
+                                            (with-current-buffer buf
+                                              (derived-mode-p 'dired-mode))))))
+    "Dired buffer source for `consult-buffer'.
+The source is hidden by default and can be summoned via its narrow key.
+Only buffers returned by the `consult-buffer-list-function' are taken
+into account.")
+
+  (defvar consult-source-magit-buffer
+    `( :name     "magit Buffer"
+       :narrow   ?m
+       :hidden   t
+       :category buffer
+       :face     consult-buffer
+       :history  buffer-name-history
+       :state    ,#'consult--buffer-state
+       :items
+       ,(lambda () (consult--buffer-query :sort 'visibility
+                                          :as #'consult--buffer-pair
+                                          :predicate
+                                          (lambda (buf)
+                                            (with-current-buffer buf
+                                              (derived-mode-p 'magit-mode))))))
+    "Dired buffer source for `consult-buffer'.
+The source is hidden by default and can be summoned via its narrow key.
+Only buffers returned by the `consult-buffer-list-function' are taken
+into account.")
+
+  (setopt consult-buffer-sources
+          '(consult-source-buffer
+            consult-source-hidden-buffer
+            consult-source-dired-buffer
+            consult-source-magit-buffer
+            consult-source-modified-buffer
+            consult-source-other-buffer
+            consult-source-recent-file
+            consult-source-buffer-register
+            consult-source-file-register
+            consult-source-project-buffer-hidden
+            consult-source-project-recent-file-hidden
+            consult-source-project-root-hidden))
+
   ;; Optionally make narrowing help available in the minibuffer.
   ;; You may want to use `embark-prefix-help-command' or which-key instead.
   ;; (keymap-set consult-narrow-map (concat consult-narrow-key " ?") #'consult-narrow-help)
