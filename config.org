@@ -3833,23 +3833,23 @@ delete."
   ;; HACK: Done to lazy-load this package until first invocation.
   (setq ghostel-compile-global-mode t)
   (autoload 'ghostel-compile--compilation-start-advice "ghostel-compile")
-  (advice-add 'compilation-start :around #'ghostel-compile--compilation-start-advice)
+  (advice-add 'compilation-start :around #'ghostel-compile--compilation-start-advice))
 
+(use-package evil-ghostel
+  :ensure (:host github :repo "dakra/ghostel" :files ("extensions/evil-ghostel/*.el"))
+  :after (ghostel evil)
+  :hook (ghostel-mode . evil-ghostel-mode)
+  :preface
   (defun e/evil-ghostel-kill-word ()
     (interactive)
     (evil-ghostel-insert)
     (ghostel-send-key "d" "meta"))
-
-  (with-eval-after-load 'evil
-    (evil-define-key 'motion ghostel-semi-char-mode-map (kbd "C-a") 'doom/backward-to-bol-or-indent)
-    (evil-define-key '(motion insert) ghostel-semi-char-mode-map (kbd "C-S-<backspace>") 'e/evil-ghostel-kill-word)))
-
-(use-package evil-ghostel
-  :ensure ghostel
-  :hook (ghostel-mode . evil-ghostel-mode))
+  :config
+  (evil-define-key 'motion ghostel-semi-char-mode-map (kbd "C-a") 'doom/backward-to-bol-or-indent)
+  (evil-define-key '(motion insert) ghostel-semi-char-mode-map (kbd "C-S-<backspace>") 'e/evil-ghostel-kill-word))
 
 (use-package ghostel-eshell
-  :ensure ghostel
+  :ensure nil
   :hook (eshell-load . ghostel-eshell-visual-command-mode)
   :init
   (with-eval-after-load 'em-term
