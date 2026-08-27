@@ -197,7 +197,6 @@
 (setq dabbrev-case-replace nil)
 (setq xref-search-program 'ripgrep)
 (setq mode-line-collapse-minor-modes t)
-(setq-default wrap-prefix "        ")
 (setq-default truncate-partial-width-windows nil)
 (setq-default truncate-lines t)
 (setq-default fill-column 80)
@@ -219,6 +218,9 @@
 (setq switch-to-buffer-obey-display-actions t)
 (setq dired-auto-revert-buffer #'dired-directory-changed-p)
 (setq confirm-kill-emacs 'y-or-n-p)
+
+(global-visual-wrap-prefix-mode 1)
+
 (setq use-dialog-box nil)
 (setq comment-empty-lines t)
 (setq sentence-end-double-space nil)
