@@ -834,7 +834,7 @@ at the values with which this function was called."
 * Emojies
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package emojify
-  :hook (elpaca-after-init . global-emojify-mode))
+  :defer t)
 #+end_src
 
 * Dired
