@@ -3145,15 +3145,16 @@ the process"
   (interactive
    (let ((selected-text (if (use-region-p)
                             (buffer-substring-no-properties (region-beginning) (region-end)))))
-     (list (read-string "Google search: " selected-text))))
+     (list (read-string "gsearch: " selected-text))))
   (cond
    ((string-match-p "^https?://" query)
     (browse-url query))
    ((equal query "")
     (browse-url query))
+   ((and current-prefix-arg)
+    (browse-url (concat "https://www.google.com/search?q=" (url-hexify-string query))))
    (t
-    (browse-url
-     (concat "https://www.google.com/search?q=" (url-hexify-string query))))))
+    (browse-url (concat "https://www.google.com/search?q=" (url-hexify-string query) "&udm=50&ie=UTD-8")))))
 #+end_src
 
 ** Find file under selection
