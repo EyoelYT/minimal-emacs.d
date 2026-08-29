@@ -4351,12 +4351,13 @@ delete."
 (global-set-key (kbd "S-<down>") 'scroll-up-line)
 (with-eval-after-load 'evil
   (evil-define-key '(normal visual motion insert) global-map (kbd "C-<tab>") 'evil-switch-to-windows-last-buffer)
-  (global-set-key (kbd "S-<left>")  'evil-scroll-left)
+  (global-set-key (kbd "S-<left>") 'evil-scroll-left)
   (global-set-key (kbd "S-<right>") 'evil-scroll-right)
-  (evil-define-key '(normal visual motion) global-map (kbd "<up>")    'evil-previous-visual-line)
-  (evil-define-key '(normal visual motion) global-map (kbd "<down>")  'evil-next-visual-line)
-  (evil-define-key 'operator               global-map (kbd "<up>")    'evil-previous-line)
-  (evil-define-key 'operator               global-map (kbd "<down>")  'evil-next-line))
+  (evil-define-key '(motion) minibuffer-local-map (kbd "RET") 'exit-minibuffer)
+  (evil-define-key '(normal visual motion) global-map (kbd "<up>") 'evil-previous-visual-line)
+  (evil-define-key '(normal visual motion) global-map (kbd "<down>") 'evil-next-visual-line)
+  (evil-define-key 'operator global-map (kbd "<up>") 'evil-previous-line)
+  (evil-define-key 'operator global-map (kbd "<down>") 'evil-next-line))
 
 (define-leader-keys
  "s s" '(+default/search-buffer                    :which-key "+default/search-buffer")
