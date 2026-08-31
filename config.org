@@ -4135,6 +4135,13 @@ delete."
 (define-key global-map (kbd "C-_") 'global-text-scale-adjust)
 #+end_src
 
+** Unimpaired style maps
+#+begin_src emacs-lisp :tangle post-init.el
+(with-eval-after-load 'evil
+  (evil-define-key 'motion global-map (kbd "]e") 'next-error)
+  (evil-define-key 'motion global-map (kbd "[e") 'previous-error))
+#+end_src
+
 ** TODO Unimpaired style maps
 #+begin_src emacs-lisp
 (:when (modulep! :checkers spell)
