@@ -3797,6 +3797,12 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 #+end_src
 
 * TODO Formatting
+#+begin_src emacs-lisp :tangle post-init.el
+(use-package jq-format
+  :ensure t
+  :defer t)
+#+end_src
+
 * Eshell
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package eshell
