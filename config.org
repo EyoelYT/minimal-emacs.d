@@ -657,7 +657,8 @@ at the values with which this function was called."
   (setq eglot-sync-connect 3
         eglot-extend-to-xref t
         eglot-autoshutdown t
-        eglot-ignored-server-capabilities '(:documentHighlightProvider)))
+        eglot-ignored-server-capabilities '( :documentHighlightProvider
+                                             :documentOnTypeFormattingProvider )))
 #+end_src
 
 * General Keybinding Package
