@@ -1377,6 +1377,7 @@ Else do `vertico-exit'."
   :commands vertico-mode
   :hook (elpaca-after-init . vertico-mode)
   :config
+  (vertico-flat-mode 1)
   (setq vertico-count 8)
   (setq vertico-count-format '("%-7s " . "%s/%s"))
   (setq vertico-resize nil)
