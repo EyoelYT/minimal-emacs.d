@@ -197,6 +197,8 @@
 (setq dabbrev-case-replace nil)
 (setq xref-search-program 'ripgrep)
 (setq mode-line-collapse-minor-modes t)
+(setq mouse-wheel-tilt-scroll t)
+(setq mouse-wheel-flip-direction t)
 (setq-default truncate-partial-width-windows nil)
 (setq-default truncate-lines t)
 (setq-default fill-column 80)
