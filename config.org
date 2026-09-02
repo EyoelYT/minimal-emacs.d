@@ -4251,6 +4251,12 @@ delete."
   (define-key evil-insert-state-map (kbd "S-<return>") 'electric-newline-and-maybe-indent))
 #+end_src
 
+** Profiler Bindings
+#+begin_src emacs-lisp :tangle post-init.el
+(define-leader-keys
+  "h T" '(toggle-profiler :which-key "toggle profiler"))
+#+end_src
+
 ** File Bindings
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
@@ -4394,6 +4400,12 @@ delete."
   (evil-define-key '(insert emacs) eshell-mode-map (kbd "C-d") #'+eshell/quit-or-delete-char))
 #+end_src
 
+** Ghostel Bindings
+#+begin_src emacs-lisp :tangle post-init.el
+(define-leader-keys
+  "o t" '(ghostel :which-key "ghostel"))
+#+end_src
+
 ** Isearch visual windows
 #+begin_src emacs-lisp :tangle post-init.el
 (global-set-key (kbd "C-s") #'ey/window-search)
@@ -4422,6 +4434,7 @@ delete."
  ","     '(consult-buffer                     :which-key "List buffers")
  "<"     '(consult-buffer                     :which-key "List all buffers")
  "b B"   '(consult-buffer                     :which-key "List all buffers")
+ "b R"   '(rename-buffer                      :which-key "Rename buffer")
  "b r"   '(revert-buffer                      :which-key "Revert buffer"))
 #+end_src
 
