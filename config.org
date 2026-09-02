@@ -799,7 +799,7 @@ at the values with which this function was called."
 (use-package blamer
   :defer t
   :config
-  (setq blamer-idle-time 10.0
+  (setq blamer-idle-time 0.5
         blamer-commit-formatter "• %s"
         blamer-prettify-time-p t
         blamer-smart-background-p t
@@ -807,7 +807,7 @@ at the values with which this function was called."
         blamer-max-commit-message-length 80
         blamer-author-formatter "%s, "
         blamer-force-truncate-long-line nil
-        blamer-max-lines 2))
+        blamer-max-lines 1))
 #+end_src
 
 * Nerd Icons
