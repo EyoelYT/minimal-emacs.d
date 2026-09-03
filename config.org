@@ -870,7 +870,23 @@ at the values with which this function was called."
   :commands dired-jump
   :init
   (setq dired-dwim-target t
-        dired-kill-when-opening-new-dired-buffer t))
+        dired-kill-when-opening-new-dired-buffer t)
+  :config
+  (let ((args (list "-ahl" "-v" "--group-directories-first")))
+    (setq dired-listing-switches (string-join args " "))
+
+    (defun +dired-disable-gnu-ls-flags-maybe-h ()
+      "Remove extraneous switches from `dired-actual-switches' when it's
+uncertain that they are supported (e.g. over TRAMP or on Windows).
+
+Fixes doomemacs/core#1703: dired over TRAMP displays a blank screen.
+Fixes doomemacs/core#3939: unsortable dired entries on Windows."
+      (when (or (file-remote-p default-directory)
+                (and (boundp 'ls-lisp-use-insert-directory-program)
+                     (not ls-lisp-use-insert-directory-program)))
+        (setq-local dired-actual-switches (car args))))
+
+    (add-hook 'dired-mode-hook #'+dired-disable-gnu-ls-flags-maybe-h)))
 #+end_src
 
 ** Dired Icons
