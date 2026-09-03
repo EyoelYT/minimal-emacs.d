@@ -770,6 +770,29 @@ at the values with which this function was called."
   ([remap describe-command]  . helpful-command)
   ([remap describe-variable] . helpful-variable)
   ([remap describe-key]      . helpful-key))
+
+(use-package elisp-demos
+  :ensure t
+  :defer t
+  :init
+  (advice-add #'describe-function-1 :after #'elisp-demos-advice-describe-function-1)
+  (advice-add #'helpful-update :after #'elisp-demos-advice-helpful-update)
+  :config
+  ;; HACK: These functions open Org files non-interactively without any
+  ;;   performance optimizations. Given how prone org-mode is to being tied to
+  ;;   expensive functionality, this will often introduce unexpected freezes
+  ;;   without this advice.
+  ;; TODO: PR upstream?
+  (defun +elisp--optimize-org-init-a (fn &rest args)
+    (dlet ((org-inhibit-startup t)
+           (doom-inhibit-local-var-hooks t)
+           enable-dir-local-variables
+           org-mode-hook)
+      (apply fn args)))
+
+  (advice-add #'elisp-demos--export-json-file #'+elisp--optimize-org-init-a)
+  (advice-add #'elisp-demos--symbols #'+elisp--optimize-org-init-a)
+  (advice-add #'elisp-demos--syntax-highlight #'+elisp--optimize-org-init-a))
 #+end_src
 
 * All the Icons
