@@ -2641,29 +2641,26 @@ After search term is found, jump back"
 ** Magit Project Functions
 #+begin_src emacs-lisp :tangle post-init.el
 (defun magit-project-status ()
-  "Prompt to select a project using project.el, then run `magit-status' in
-its root."
+  "Select a project via project.el, then run `magit-status' in
+the selected project's root."
   (interactive)
-  (let ((projects (project-known-project-roots)))
-    (if projects
-        (let* ((project-dir (completing-read "Switch to project: " projects nil t))
-               (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
-          (magit-status-setup-buffer project-dir))
-      (user-error "There are no known projects"))))
+  (if-let ((projects (project-known-project-roots)))
+      (let* ((project (completing-read "Switch to project: " projects nil t))
+             (default-directory project)
+             (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+        (magit-status project)))
+  (user-error "There are no known projects"))
 
 (defun magit-project-log-all-branches ()
   "Prompt to select a project, then run `magit-log-all` in that project's
-root."
+root. If the buffer already exists, surface that buffer instead"
   (interactive)
-  (let ((projects (project-known-project-roots)))
-    (if projects
-        (let* ((project (completing-read "Switch to project: " projects))
-               (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
-               (default-directory project))
-          ;; magit-log-setup-buffer sets up the log view natively in the default-directory
-          (require 'magit-log)
-          (magit-log-setup-buffer nil '("--branches" "--remotes" "--graph" "--color" "-n256" "--decorate") nil))
-      (user-error "There are no known projects"))))
+  (if-let ((projects (project-known-project-roots)))
+      (let* ((project (completing-read "Switch to project: " projects nil t))
+             (default-directory project)
+             (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+        (magit-log-all-branches '("--graph" "--color" "-n256" "--decorate")))
+  (user-error "There are no known projects")))
 #+end_src
 
 ** Escape Key
