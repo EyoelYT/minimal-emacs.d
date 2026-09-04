@@ -946,6 +946,9 @@ Fixes doomemacs/core#3939: unsortable dired entries on Windows."
   ;; (setq magit-revision-insert-related-refs nil)
   (add-hook 'magit-process-mode-hook #'goto-address-mode)
 
+  (transient-append-suffix 'magit-pull "-r"
+    '("-a" "Autostash" "--autostash"))
+
   (defun ey/magit-display-buffer-fn (buffer)
     "Display BUFFER in the selected window, except...
 - If opened from a commit window, it will open below it.
