@@ -753,6 +753,17 @@ at the values with which this function was called."
  "h" '(:which-key "help"          :ignore t))
 #+end_src
 
+* Macroexpand
+#+begin_src emacs-lisp :tangle post-init.el
+(use-package macrostep :ensure t)
+(define-leader-keys
+  :keymaps 'lisp-interaction-mode-map
+  "m m" '(macrostep-expand  :which-key "macrostep-expand"))
+(define-leader-keys
+  :keymaps 'emacs-lisp-mode-map
+  "m m" '(macrostep-expand  :which-key "macrostep-expand"))
+#+end_src
+
 * Helpful
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package helpful
