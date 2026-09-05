@@ -2952,14 +2952,14 @@ Also add the value to the front of the list in the variable `values'."
           (if (region-active-p)
               (buffer-substring-no-properties (region-beginning) (region-end))
             nil)))
-     (list (read--expression "PP Eval: " selection) current-prefix-arg)))
+     (list (read--expression "Eval: " selection) current-prefix-arg)))
   (message "Evaluating...")
   (let ((result (eval expression lexical-binding)))
     ;; (values--store-value result) ; skip storing value in value ... not needed
     (if insert-value
         (let (deactivate-mark)
           (insert (pp-to-string result)))
-      (pp-display-expression result "*Pp Eval Output*" pp-use-max-width))))
+      (pp-display-expression result "*Eval Output*" pp-use-max-width))))
 #+end_src
 
 ** Search Buffer (with consult)
