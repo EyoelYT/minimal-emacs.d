@@ -767,6 +767,7 @@ at the values with which this function was called."
 * Helpful
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package helpful
+  :ensure t
   :defer t
   :commands (helpful-callable
              helpful-variable
@@ -948,8 +949,10 @@ Fixes doomemacs/core#3939: unsortable dired entries on Windows."
   :ensure (:wait t))
 
 (use-package magit
+  :ensure (:wait t)
+  :demand t
   :init (setq magit-auto-revert-mode nil)
-  :commands magit-status magit-file-delete
+  :commands (magit-status magit-file-delete)
   :config
   (setq magit-display-buffer-function #'ey/magit-display-buffer-fn)
   (setq magit-diff-refine-hunk t)
@@ -979,12 +982,8 @@ Fixes doomemacs/core#3939: unsortable dired entries on Windows."
          '(nil (inhibit-same-window . t)))
         ('(display-buffer-same-window)))))))
 
-(use-package magit-delta
-  :ensure t
-  :defer t)
-
 (use-package git-commit
-  :ensure magit
+  :ensure nil
   :hook (elpaca-after-init . global-git-commit-mode)
   :config
   (defun +vc-start-in-insert-state-maybe-h ()
@@ -1750,12 +1749,7 @@ into account.")
 * Embark
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package embark
-  :defer t
-  ;; :bind
-  ;; (("C-." . embark-act)         ;; pick some comfortable binding
-  ;;  ("C-;" . embark-dwim)        ;; good alternative: M-.
-  ;;  ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
-
+  :ensure (:wait t)
   :init
 
   ;; Optionally replace the key help with a completing-read interface
@@ -1780,7 +1774,7 @@ into account.")
 
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
-  :ensure embark)
+  :ensure nil)
 #+end_src
 
 * Hl-TODO
