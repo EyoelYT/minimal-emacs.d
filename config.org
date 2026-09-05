@@ -988,7 +988,7 @@ Fixes doomemacs/core#3939: unsortable dired entries on Windows."
   :commands wgrep-change-to-wgrep-mode)
 #+end_src
 
-* TODO Magit
+* Magit
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package transient
   :defer t
@@ -1007,6 +1007,10 @@ Fixes doomemacs/core#3939: unsortable dired entries on Windows."
 
   (transient-append-suffix 'magit-pull "-r"
     '("-a" "Autostash" "--autostash"))
+
+  (when (magit-git-version>= "2.55.0")
+      (transient-append-suffix 'magit-log "-o"
+    '("-z" "Start from the first commit" "--max-count-oldest=")))
 
   (defun ey/magit-display-buffer-fn (buffer)
     "Display BUFFER in the selected window, except...
