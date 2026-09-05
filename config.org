@@ -2697,7 +2697,7 @@ After search term is found, jump back"
   "Select a project via project.el, then run `magit-status' in
 the selected project's root."
   (interactive)
-  (if-let ((projects (project-known-project-roots)))
+  (if-let* ((projects (project-known-project-roots)))
       (let* ((project (completing-read "Switch to project: " projects nil t))
              (default-directory project)
              (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
@@ -2708,7 +2708,7 @@ the selected project's root."
   "Prompt to select a project, then run `magit-log-all` in that project's
 root. If the buffer already exists, surface that buffer instead"
   (interactive)
-  (if-let ((projects (project-known-project-roots)))
+  (if-let* ((projects (project-known-project-roots)))
       (let* ((project (completing-read "Switch to project: " projects nil t))
              (default-directory project)
              (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
