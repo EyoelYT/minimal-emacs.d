@@ -2740,30 +2740,38 @@ all hooks after it are ignored.")
 
   (defun +evil-disable-ex-highlights-h ()
     "Disable ex search buffer highlights."
-    (when (evil-ex-hl-active-p 'evil-ex-search)
-      (evil-ex-nohighlight)
-      t))
+    (when (and (fboundp 'evil-ex-hl-active-p)
+               (evil-ex-hl-active-p 'evil-ex-search))
+      (evil-ex-nohighlight) t))
+
+  (defun +evil-quit-multiedit-h ()
+    "Quit multiedit mode and return t."
+    (when (and (bound-and-true-p evil-multiedit-mode)
+               (fboundp 'evil-multiedit-abort))
+      (evil-multiedit-abort) t))
 
   (add-hook 'doom-escape-hook #'+evil-disable-ex-highlights-h)
+  (add-hook 'doom-escape-hook #'+evil-quit-multiedit-h)
 
   (defun +evil-escape-a (&rest _)
     "Call `doom/escape' if `evil-force-normal-state' is called interactively."
     (when (called-interactively-p 'any)
       (call-interactively #'doom/escape)))
 
-  (advice-add 'evil-force-normal-state :after #'+evil-escape-a)
+  ;; Run this before `evil-multiedit-mode's advice to `evil-force-normal-state' runs
+  (advice-add 'evil-force-normal-state :before #'+evil-escape-a '((depth . -50)))
 
   (defun doom/escape (&optional interactive)
     "Run `doom-escape-hook'."
     (interactive (list 'interactive))
     (let ((inhibit-quit t))
-      (cond ((minibuffer-window-active-p (minibuffer-window))
-             ;; quit the minibuffer if .
+      (cond (;; Run all escape hooks. If any returns non-nil, then stop there.
+             (run-hook-with-args-until-success 'doom-escape-hook))
+            ;; quit the minibuffer if minibuffer is active and point is in the minibuffer.
+            ((minibuffer-window-active-p (minibuffer-window))
              (when (and interactive (minibufferp))
                (setq this-command 'abort-recursive-edit)
                (abort-recursive-edit)))
-            ;; Run all escape hooks. If any returns non-nil, then stop there.
-            ((run-hook-with-args-until-success 'doom-escape-hook))
             ;; don't abort macros
             ((or defining-kbd-macro executing-kbd-macro) nil)
             ;; Back to the default
