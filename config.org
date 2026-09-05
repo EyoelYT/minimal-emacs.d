@@ -163,6 +163,42 @@
 (setq user-mail-address "eyoelytesfu@gmail.com")
 #+end_src
 
+* Custom Macros
+#+begin_src emacs-lisp :tangle post-init.el
+(defmacro cmd! (&rest body)
+  "Returns (lambda () (interactive) ,@body)
+A factory for quickly producing interaction commands, particularly for keybinds
+or aliases."
+  (declare (doc-string 1) (side-effect-free t))
+  `(lambda (&rest _) (interactive) ,@body))
+#+end_src
+
+* Key Translations
+#+begin_src emacs-lisp :tangle post-init.el
+;; HACK: Emacs can't distinguish C-i from TAB, or C-m from RET, in either GUI or
+;;   TTY frames. This is a byproduct of its history with the terminal, which
+;;   can't distinguish them either, however, Emacs has separate input events for
+;;   many contentious keys like TAB and RET (like [tab] and [return], aka
+;;   "<tab>" and "<return>"), which are only triggered in GUI frames, so here, I
+;;   create one for C-i. Won't work in TTY frames, though.
+(pcase-dolist (`(,key ,fallback . ,events)
+               '(([C-i] [?\C-i] tab kp-tab)
+                 ([C-m] [?\C-m] return kp-return)))
+  (define-key
+   key-translation-map fallback
+   (cmd! (if (when-let* ((keys (this-single-command-raw-keys)))
+               (and (display-graphic-p)
+                    (not (cl-loop for event in events
+                                  if (cl-position event keys)
+                                  return t))
+                    ;; Use FALLBACK if nothing is bound to KEY, otherwise
+                    ;; we've broken all pre-existing FALLBACK keybinds.
+                    (key-binding
+                     (vconcat (if (= 0 (length keys)) [] (cl-subseq keys 0 -1))
+                              key) nil t)))
+             key fallback))))
+#+end_src
+
 * Autosaves WINDOWS
 #+begin_src emacs-lisp :tangle post-init.el
                                         ; WINDOWS SPECIFIC
