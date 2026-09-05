@@ -1001,7 +1001,6 @@ Fixes doomemacs/core#3939: unsortable dired entries on Windows."
   :commands (magit-status magit-file-delete)
   :config
   (setq magit-display-buffer-function #'ey/magit-display-buffer-fn)
-  (setq magit-diff-refine-hunk t)
   (setq magit-save-repository-buffers nil)
   ;; (setq magit-revision-insert-related-refs nil)
   (add-hook 'magit-process-mode-hook #'goto-address-mode)
