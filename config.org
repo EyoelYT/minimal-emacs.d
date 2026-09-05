@@ -4679,3 +4679,9 @@ delete."
 (add-hook 'python-ts-mode-hook #'+treesit-better-colors-mode)
 #+end_src
 
+* Purr
+#+begin_src emacs-lisp :tangle post-init.el
+(use-package purr
+  :ensure (:host sourcehut :repo "zelda/purr.el")
+  :defer t)
+#+end_src
