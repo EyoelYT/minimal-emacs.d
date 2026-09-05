@@ -787,8 +787,8 @@ at the values with which this function was called."
   :ensure t
   :defer t
   :init
-  (advice-add #'describe-function-1 :after #'elisp-demos-advice-describe-function-1)
-  (advice-add #'helpful-update :after #'elisp-demos-advice-helpful-update)
+  (advice-add 'describe-function-1 :after #'elisp-demos-advice-describe-function-1)
+  (advice-add 'helpful-update :after #'elisp-demos-advice-helpful-update)
   :config
   ;; HACK: These functions open Org files non-interactively without any
   ;;   performance optimizations. Given how prone org-mode is to being tied to
@@ -802,9 +802,9 @@ at the values with which this function was called."
            org-mode-hook)
       (apply fn args)))
 
-  (advice-add #'elisp-demos--export-json-file #'+elisp--optimize-org-init-a)
-  (advice-add #'elisp-demos--symbols #'+elisp--optimize-org-init-a)
-  (advice-add #'elisp-demos--syntax-highlight #'+elisp--optimize-org-init-a))
+  (advice-add #'elisp-demos--export-json-file :around #'+elisp--optimize-org-init-a)
+  (advice-add #'elisp-demos--symbols :around #'+elisp--optimize-org-init-a)
+  (advice-add #'elisp-demos--syntax-highlight :around #'+elisp--optimize-org-init-a))
 #+end_src
 
 * All the Icons
