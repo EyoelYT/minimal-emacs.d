@@ -52,9 +52,9 @@
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
 (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                       :ref nil :depth 1 :inherit ignore
-                       :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-                       :build (:not elpaca--activate-package)))
+                              :ref nil :depth 1 :inherit ignore
+                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                              :build (:not elpaca--activate-package)))
 (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
        (build (expand-file-name "elpaca/" elpaca-builds-directory))
        (order (cdr elpaca-order))
@@ -1255,9 +1255,7 @@ scaling"
         doom-modeline-persp-icon nil))
 
 (use-package hide-mode-line
-  :defer t
-  ;; :init (global-hide-mode-line-mode 1)
-  )
+  :defer t)
 #+end_src
 
 * AutoRevert
@@ -1789,27 +1787,7 @@ into account.")
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package embark
   :ensure (:wait t)
-  :init
-
-  ;; Optionally replace the key help with a completing-read interface
-  (setq prefix-help-command #'embark-prefix-help-command)
-
-  ;; Show the Embark target at point via Eldoc. You may adjust the
-  ;; Eldoc strategy, if you want to see the documentation from
-  ;; multiple providers. Beware that using this can be a little
-  ;; jarring since the message shown in the minibuffer can be more
-  ;; than one line, causing the modeline to move up and down:
-
-  ;; (add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
-  ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
-
-  :config
-
-  ;; Hide the mode line of the Embark live/completions buffers
-  (add-to-list 'display-buffer-alist
-               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-                 nil
-                 (window-parameters (mode-line-format . none)))))
+  :init (setq prefix-help-command #'embark-prefix-help-command))
 
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
@@ -2104,6 +2082,7 @@ Prefix arg to do cpu+mem. Default runs cpu profiler."
 ;; (advice-add #'evil-toggle-fold :around #'+evil-toggle-fold-a)
 ;; (advice-remove #'evil-toggle-fold #'+evil-toggle-fold-a)
 #+end_src
+
 ** Windows Terminal
 #+begin_src emacs-lisp :tangle post-init.el
 (defun ey/windows-terminal-open-profile ()
@@ -2665,6 +2644,7 @@ If on top of an Org link, will only copy the link component."
     (kill-new (or url (user-error "No URL at point")))
     (message "Copied link: %s" url)))
 #+end_src
+
 ** Org Mode cycle subtree recursively
 #+begin_src emacs-lisp :tangle post-init.el
 (defun ey/org-cycle-subtree-recursively ()
@@ -2712,7 +2692,7 @@ After search term is found, jump back"
   "Copy the current buffer's path to the kill ring."
   (interactive)
   (if-let* ((filename (or (buffer-file-name (buffer-base-buffer))
-                          (bound-and-true-p list-buffers-directory))))
+                         (bound-and-true-p list-buffers-directory))))
       (let ((path (abbreviate-file-name
                    (if root
                        (file-relative-name filename root)
@@ -4444,7 +4424,6 @@ delete."
 #+end_src
 
 ** Devdocs
-
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
  "o x" 'devdocs-lookup
