@@ -820,12 +820,6 @@ at the values with which this function was called."
 * Macroexpand
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package macrostep :ensure t)
-(define-leader-keys
-  :keymaps 'lisp-interaction-mode-map
-  "m m" '(macrostep-expand  :which-key "macrostep-expand"))
-(define-leader-keys
-  :keymaps 'emacs-lisp-mode-map
-  "m m" '(macrostep-expand  :which-key "macrostep-expand"))
 #+end_src
 
 * Helpful
@@ -4682,6 +4676,26 @@ delete."
  "g =" '(diff-hl-show-hunk              :which-key "diff-hl-show-hunk")
  "g s" '(diff-hl-stage-current-hunk     :which-key "diff-hl-stage-current-hunk")
  "g d" '(diff-hl-revert-hunk            :which-key "diff-hl-revert-hunk"))
+#+end_src
+
+** Elisp Mode Bindings
+#+begin_src emacs-lisp :tangle post-init.el
+(define-leader-keys
+  :keymaps 'emacs-lisp-mode-map
+  "m m"   'macrostep-expand
+  "m e"   '(:ignore t :which-key "eval")
+  "m e d" 'eval-defun
+  "m e b" 'eval-buffer
+  "m e e" 'eval-last-sexp
+  "m e l" 'load-library)
+(define-leader-keys
+  :keymaps 'lisp-interaction-mode-map
+  "m m"   'macrostep-expand
+  "m e"   '(:ignore t :which-key "eval")
+  "m e d" 'eval-defun
+  "m e b" 'eval-buffer
+  "m e e" 'eval-last-sexp
+  "m e l" 'load-library)
 #+end_src
 
 * Runtime Performance (Control when garbage collection occurs)
