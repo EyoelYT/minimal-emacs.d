@@ -3532,6 +3532,17 @@ Not using this I specifically want to exit buffer flip mode when Ctrl is release
   :defer t)
 #+end_src
 
+* Buffer Terminator
+#+begin_src emacs-lisp :tangle post-init.el
+(use-package buffer-terminator
+  :ensure t
+  :defer t
+  :config
+  (setopt buffer-terminator-verbose t
+          buffer-terminator-inactivity-timeout (* 3 60 60) ; 3 hours
+          buffer-terminator-interval (* 60 60))) ; 1 hour
+#+end_src
+
 * Dape mode
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package dape
