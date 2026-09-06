@@ -4457,6 +4457,30 @@ delete."
 (global-set-key [remap list-directory] #'consult-dir)
 #+end_src
 
+** Minibuffer Mappings
+#+begin_src emacs-lisp :tangle post-init.el
+(defvar +default-minibuffer-maps '(minibuffer-local-map
+                                   minibuffer-local-ns-map
+                                   minibuffer-local-completion-map
+                                   minibuffer-local-must-match-map
+                                   minibuffer-local-isearch-map
+                                   read-expression-map)
+  "A list of all the keymaps used for the minibuffer.")
+
+(general-def
+  :states '(insert emacs)
+  :keymaps (append +default-minibuffer-maps
+                   (when (featurep 'evil-ex)
+                     '(evil-ex-completion-map)))
+  "C-s" #'consult-history)
+
+(general-def
+  :states 'insert
+  :keymaps +default-minibuffer-maps
+  "C-j"    #'next-line
+  "C-k"    #'previous-line)
+#+end_src
+
 ** Consult Mappings
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
