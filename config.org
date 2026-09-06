@@ -248,9 +248,9 @@ or aliases."
  and for Lisp evaluation.\n;; To create a file, visit it with \
 `\\[find-file]' and enter text in its buffer.\n\n")
 (setq-default tab-always-indent t)
-(setq scroll-preserve-screen-position 1)
-(setq pixel-scroll-precision-use-momentum nil)
-(pixel-scroll-precision-mode 1)
+(setq scroll-conservatively 0
+      scroll-margin 0
+      scroll-preserve-screen-position 1)
 (setq minibuffer-prompt-properties
       '(read-only t intangible t cursor-intangible t face minibuffer-prompt))
 (setq switch-to-buffer-obey-display-actions t)
@@ -3731,13 +3731,13 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 
 * Ultra Scroll
 #+begin_src emacs-lisp :tangle post-init.el
-(use-package ultra-scroll
-  :ensure (:host github :repo "jdtsmith/ultra-scroll")
-  :init
-  (setq scroll-conservatively 0
-        scroll-margin 0)
-  :config
-  (ultra-scroll-mode 1))
+;; (use-package ultra-scroll
+;;   :ensure (:host github :repo "jdtsmith/ultra-scroll")
+;;   :init
+;;   (setq scroll-conservatively 0
+;;         scroll-margin 0)
+;;   :config
+;;   (ultra-scroll-mode 1))
 #+end_src
 
 * Treesitter
