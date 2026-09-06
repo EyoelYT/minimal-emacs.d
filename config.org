@@ -4472,6 +4472,9 @@ delete."
   "s p" '(ey/consult-search-project       :which-key "ey/consult-search-project")
   "s P" '(ey/consult-search-other-project :which-key "ey/consult-search-project")
   "RET" '(consult-bookmark                :which-key "consult-bookmark"))
+
+(with-eval-after-load 'evil
+  (evil-define-key '(insert emacs) eshell-mode-map (kbd "C-s") 'consult-history))
 #+end_src
 
 ** Cape Mappings
