@@ -2782,8 +2782,9 @@ all hooks after it are ignored.")
 
   (defun +evil-disable-ex-highlights-h ()
     "Disable ex search buffer highlights."
-    (when (and (fboundp 'evil-ex-hl-active-p)
-               (evil-ex-hl-active-p 'evil-ex-search))
+    (when (or (and (fboundp 'evil-ex-hl-active-p)
+                   (evil-ex-hl-active-p 'evil-ex-search))
+              (bound-and-true-p anzu--state))
       (evil-ex-nohighlight) t))
 
   (defun +evil-quit-multiedit-h ()
