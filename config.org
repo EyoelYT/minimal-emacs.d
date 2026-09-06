@@ -1135,7 +1135,7 @@ otherwise in default state."
 
   ;; Key-Bindings
   (with-eval-after-load 'diff-hl
-    (with-eval-after-load 'evil
+    (when (featurep 'evil)
       (progn
         (evil-define-key 'motion global-map (kbd "]d")   #'diff-hl-next-hunk)
         (evil-define-key 'motion global-map (kbd "[d")   #'diff-hl-previous-hunk))))
@@ -3567,7 +3567,7 @@ Not using this I specifically want to exit buffer flip mode when Ctrl is release
 (use-package buffer-flip
   :ensure t
   :config
-  (with-eval-after-load 'evil
+  (when (featurep 'evil)
     (evil-define-key '(normal visual motion insert) global-map (kbd "C-<tab>") 'buffer-flip)
     (evil-define-key '(normal visual motion insert) buffer-flip-map (kbd "C-<tab>") 'buffer-flip-forward)
     (evil-define-key '(normal visual motion insert) buffer-flip-map (kbd "C-S-<tab>") 'buffer-flip-backward)
@@ -3924,14 +3924,16 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
   :defer t
   :init
   (with-eval-after-load 'vertico-multiform
-    (add-to-list 'vertico-multiform-categories '(jinx buffer)) ; to have it as grid in a temp buffer
-    (vertico-multiform-mode))
+    (add-to-list 'vertico-multiform-categories '(jinx buffer))) ; to have it as grid in a temp buffer
   :config
-  (setq jinx-languages "en_US")
+  (when (fboundp 'vertico-multiform-mode)
+    (vertico-multiform-mode 1))
+  (setq jinx-languages "en_US"
+        jinx-camel-modes '(prog-mode))
   (with-eval-after-load 'evil
     (evil-define-key 'normal global-map (kbd "z=") #'jinx-correct)
     (evil-define-key 'motion global-map (kbd "[s") #'jinx-previous)
-    (evil-define-key 'motion global-map (kbd "]s") #'jinx-next) (setq jinx-camel-modes '(prog-mode))))
+    (evil-define-key 'motion global-map (kbd "]s") #'jinx-next)))
 #+end_src
 
 * TODO Formatting
@@ -4016,7 +4018,7 @@ delete."
 ;;               (lambda ()
 ;;                 (setq xterm-color-preserve-properties t)))
 ;;
-;;     (with-eval-after-load 'esh-mode
+;;     (when (featurep 'esh-mode)
 ;;       (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
 ;;       (setq eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions)))
 ;;     (setenv "TERM" "xterm-256color"))
@@ -4418,7 +4420,7 @@ delete."
   (define-key magit-section-mode-map  (kbd "M-2")                              nil)
   (define-key magit-section-mode-map  (kbd "M-3")                              nil)
   (define-key magit-section-mode-map  (kbd "M-4")                              nil)
-  (with-eval-after-load 'evil
+  (when (featurep 'evil)
     (evil-define-key '(normal) magit-section-mode-map (kbd "M-1")              nil)
     (evil-define-key '(normal) magit-section-mode-map (kbd "M-2")              nil)
     (evil-define-key '(normal) magit-section-mode-map (kbd "M-3")              nil)
@@ -4443,7 +4445,7 @@ delete."
   "'" '(vertico-repeat-select  :which-key "vertico search history"))
 (with-eval-after-load 'vertico
   (define-key vertico-map (kbd "C-SPC") '+vertico/embark-preview)
-  (with-eval-after-load 'evil
+  (when (featurep 'evil)
     (evil-define-key '(insert motion) vertico-map (kbd "C-u") 'vertico-scroll-down)
     (evil-define-key '(insert motion) vertico-map (kbd "C-d") 'vertico-scroll-up)
     (evil-define-key '(insert) vertico-map (kbd "DEL") 'vertico-directory-delete-char)
@@ -4604,8 +4606,8 @@ delete."
 
 ** Corfu Bindings
 #+begin_src emacs-lisp :tangle post-init.el
-(with-eval-after-load 'evil
-  (with-eval-after-load 'corfu
+(with-eval-after-load 'corfu
+  (when (featurep 'evil)
     (evil-define-key 'insert corfu-map (kbd "C-SPC") #'corfu-insert-separator)
     (evil-define-key 'insert corfu-map (kbd "TAB")   #'corfu-next)
     (evil-define-key 'insert corfu-map [tab] #'corfu-next)
