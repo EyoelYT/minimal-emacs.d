@@ -4757,3 +4757,31 @@ delete."
   :ensure (:host sourcehut :repo "zelda/purr.el")
   :defer t)
 #+end_src
+
+* Modeline Invisible Mode                                               :ppr:
+#+begin_src emacs-lisp :tangle post-init.el
+(defcustom global-mode-line-invisible-mode-excluded-modes '()
+  "Major modes unaffected by `global-mode-line-invisible-mode'.
+
+Modes derived from an element of this list are also excluded."
+  :type '(repeat symbol)
+  :group 'mode-line)
+
+(defun global-mode-line-invisible-mode--excluded-p ()
+  (if (fboundp 'derived-mode-all-parents)
+      (derived-mode-p global-mode-line-invisible-mode-excluded-modes)
+    (apply #'derived-mode-p global-mode-line-invisible-mode-excluded-modes)))
+
+(defun global-mode-line-invisible-mode--turn-on ()
+  "Enable `mode-line-invisible-mode' in the current buffer."
+  (unless (or (bound-and-true-p mode-line-invisible-mode)
+              (minibufferp)                       ; skip minibuffer
+              (string-prefix-p " " (buffer-name)) ; skip internal buffers
+              (global-mode-line-invisible-mode--excluded-p))
+    (mode-line-invisible-mode 1)))
+
+(define-globalized-minor-mode global-mode-line-invisible-mode
+  mode-line-invisible-mode
+  global-mode-line-invisible-mode--turn-on
+  :group 'mode-line)
+#+end_src
