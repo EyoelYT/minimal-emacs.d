@@ -313,6 +313,17 @@ or aliases."
 (setq frame-title-format "")
 #+end_src
 
+* Display buffer alist
+#+begin_src emacs-lisp :tangle post-init.el
+(add-to-list 'display-buffer-alist
+               '("\\*Process List\\*"
+                 (display-buffer-reuse-mode-window display-buffer-at-bottom)
+                 (window-height . 0.3)
+                 (dedicated . t)
+                 (preserve-size . (t . t))
+                 (body-function . select-window)))
+#+end_src
+
 * TODO MELPA and other package repositories
 #+begin_src emacs-lisp :tangle post-init.el
 ;; Add package archives
