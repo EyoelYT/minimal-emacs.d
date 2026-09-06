@@ -3209,35 +3209,58 @@ true end of the line. The opposite of `doom/backward-to-bol-or-indent'."
 
 ** Mark and move to beg/end of line
 #+begin_src emacs-lisp :tangle post-init.el
+;;; Visual line-extension commands
+
+(defun ey--first-non-blank-in-current-line ()
+  "Position of the first non-blank char of the current line.
+Returns `line-beginning-position' on a blank line."
+  (save-excursion
+    (back-to-indentation)
+    (if (eolp) (line-beginning-position) (point))))
+
+(defun ey--last-non-blank-in-current-line ()
+  "Position of the last non-blank char of the current line's code.
+Ignores a trailing comment and trailing whitespace. Returns
+`line-beginning-position' when the line has no such char."
+  (save-excursion
+    (doom/forward-to-last-non-comment-or-eol) ; point ends up *after* last code char
+    (skip-chars-backward " \t")
+    (max (line-beginning-position) (1- (point)))))
+
+(defun ey--visual-extend-to (target-fn)
+  "Enter (or keep) charwise Visual state, extending the selection to (TARGET-FN).
+TARGET-FN is called with no arguments and must return a buffer position.
+Any existing selection anchor is preserved; line-/block-wise selections
+are normalized to charwise."
+  ;; leave insert/replace/emacs state *without* moving point
+  (unless (or (evil-visual-state-p) (evil-normal-state-p) (evil-motion-state-p))
+    (let ((evil-move-cursor-back nil))
+      (evil-change-to-initial-state)
+      (unless (or (evil-normal-state-p) (evil-motion-state-p))
+        (evil-normal-state 1))))
+  ;; anchor: keep the existing one in visual state, else start at point
+  (let ((anchor (if (evil-visual-state-p) (or (mark t) (point)) (point))))
+    ;; move to the target
+    (goto-char (funcall target-fn))
+    ;; (re)build the selection
+    (evil-visual-make-selection anchor (point) 'char)))
+
 (defun ey/visual-to-first-non-blank-in-current-line ()
-  "Visual mode and extend selection to the first non-blank char in the current line."
+  "Visual state, extending the selection to the first non-blank char of the line."
   (interactive)
-  (let ((visual-start (or (mark) (point)))  ; Get the current visual start (or point if not in visual mode)
-        (current-point (point)))
-    ;; Ensure we're in visual mode
-    (unless (region-active-p)
-      (let ((evil-move-cursor-back nil))
-        (if (memq (evil-initial-state major-mode) '(normal motion))
-            (evil-change-to-initial-state)
-          (evil-normal-state 1)))
-      (evil-visual-char))
-    ;; Move to the first non-blank character
-    (doom/backward-to-bol-or-indent)))
+  (ey--visual-extend-to #'ey--first-non-blank-in-current-line))
 
 (defun ey/visual-to-last-non-blank-in-current-line ()
-  "Visual mode and extend selection to the last non-blank char in the
-current line. Change into `evil-normal-state' or `evil-motion-state' in
-the process"
+  "Visual state, extending the selection to the last non-blank char of the line."
   (interactive)
-  (unless (region-active-p)
-    (let ((evil-move-cursor-back nil))
-      (if (memq (evil-initial-state major-mode) '(normal motion))
-          (evil-change-to-initial-state)
-        (evil-normal-state 1))))
-  (evil-visual-char)
-  (doom/forward-to-last-non-comment-or-eol)
-  (if (or (looking-at "[ \t\n]") (eobp))
-      (evil-backward-char)))
+  (ey--visual-extend-to #'ey--last-non-blank-in-current-line))
+
+;; Without :keep-visual, evil expands the region before the command (off-by-one)
+;; and exits Visual state after it (that's the state-dependent weirdness).
+(dolist (cmd '(ey/visual-to-first-non-blank-in-current-line
+               ey/visual-to-last-non-blank-in-current-line))
+  (evil-add-command-properties cmd :keep-visual t :repeat 'abort))
+
 #+end_src
 
 ** Mark-Sexp function should incite Normal mode instead of showing insert mode behavior during visual mode
