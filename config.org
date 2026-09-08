@@ -1303,9 +1303,6 @@ scaling"
         doom-modeline-workspace-name nil
         doom-modeline-persp-name nil
         doom-modeline-persp-icon nil))
-
-(use-package hide-mode-line
-  :defer t)
 #+end_src
 
 * AutoRevert
@@ -4519,7 +4516,7 @@ delete."
 (define-leader-keys
  "s s" '(+default/search-buffer                    :which-key "+default/search-buffer")
  "s m" '(ey/show-doom-modeline-in-echo-area        :which-key "show modeline")
- "s M" '(global-hide-mode-line-mode                :which-key "toggle modeline visibility")
+ "s M" '(global-mode-line-invisible-mode           :which-key "toggle modeline visibility")
  "f o" '(ey/find-file-under-selection-other-window :which-key "ey/find-file-under-selection")
  "r g" '(ey/consult-ripgrep-cwd                    :which-key "ey/consult-ripgrep-cwd")
  "f y" '(+default/yank-buffer-path                 :which-key "+default/yank-buffer-path")
