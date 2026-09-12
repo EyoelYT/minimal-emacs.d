@@ -3743,6 +3743,9 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 
 (add-hook 'prog-mode-hook #'ey/c-mode-hooks)
 (add-hook 'prog-mode-hook #'yas-minor-mode)
+
+(keymap-set prog-mode-map "C-c C-p" 'beginning-of-defun)
+(keymap-set prog-mode-map "C-c C-n" 'end-of-defun)
 #+end_src
 
 ** Lua Mode
