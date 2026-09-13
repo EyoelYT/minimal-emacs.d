@@ -3690,30 +3690,50 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 
 * Treesitter
 #+begin_src emacs-lisp :tangle post-init.el
-(setq treesit-language-source-alist
-      '((hyprlang   "https://github.com/tree-sitter-grammars/tree-sitter-hyprlang")
-        (bash       "https://github.com/tree-sitter/tree-sitter-bash")
-        (cmake      "https://github.com/uyha/tree-sitter-cmake")
-        (css        "https://github.com/tree-sitter/tree-sitter-css")
-        (elisp      "https://github.com/Wilfred/tree-sitter-elisp")
-        (rust       "https://github.com/tree-sitter/tree-sitter-rust")
-        (go         "https://github.com/tree-sitter/tree-sitter-go")
-        (html       "https://github.com/tree-sitter/tree-sitter-html")
-        (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-        (json       "https://github.com/tree-sitter/tree-sitter-json")
-        (make       "https://github.com/alemuller/tree-sitter-make")
-        (typst      "https://github.com/uben0/tree-sitter-typst" "master" "src")
-        (markdown   "https://github.com/ikatyang/tree-sitter-markdown")
+(use-package treesit
+  :ensure nil
+  :custom
+  (treesit-enabled-modes t)
+  (treesit-font-lock-level 4)
+  :config
+  (add-hook 'python-ts-mode-hook '+treesit-custom-colors-mode)
+  (add-hook 'c++-ts-mode-hook '+treesit-custom-colors-mode)
+  (add-hook 'c-ts-mode-hook '+treesit-custom-colors-mode)
+  (add-hook 'typescript-ts-mode-hook '+treesit-custom-colors-mode)
+  (add-hook 'tsx-ts-mode-hook '+treesit-custom-colors-mode)
+  (setq treesit-language-source-alist
+      '((bash       "https://github.com/tree-sitter/tree-sitter-bash")
         (python     "https://github.com/tree-sitter/tree-sitter-python")
-        (toml       "https://github.com/tree-sitter/tree-sitter-toml")
+        (glsl       "https://github.com/tree-sitter-grammars/tree-sitter-glsl")
+        (odin       "https://github.com/tree-sitter-grammars/tree-sitter-odin")
         (tsx        "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
-        (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
-        (yaml       "https://github.com/ikatyang/tree-sitter-yaml")))
-(setq treesit-font-lock-level 3)
-(setq-default forward-sexp-function 'forward-sexp-default-function)
-;; (use-package treesit-auto ; FIXME: checking for treesit language for file takes a long time
-;;   :demand t
-;;   :config (global-treesit-auto-mode))
+        (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src"))))
+#+end_src
+
+** Suppress TreeSit Minor Mode
+#+begin_src emacs-lisp :tangle post-init.el
+(defvar-local +treesit-mute-cookies nil
+  "List of cookies for muted face remappings.")
+
+(define-minor-mode +treesit-custom-colors-mode
+  "Control faces, intended for treesit modes. Best used alongside
+`treesit-font-lock-level' set to 4"
+  :local t
+  :init-value nil
+  :lighter " TS-Mute"
+  (dolist (cookie +treesit-mute-cookies)
+    (face-remap-remove-relative cookie))
+  (setq +treesit-mute-cookies nil)
+  (when +treesit-custom-colors-mode
+    (setq +treesit-mute-cookies
+          (list (face-remap-add-relative 'font-lock-variable-use-face 'default)
+                (face-remap-add-relative 'font-lock-property-use-face 'default)))))
+
+(add-hook 'c-ts-mode-hook #'+treesit-custom-colors-mode)
+(add-hook 'python-ts-mode-hook '+treesit-custom-colors-mode)
+(add-hook 'c++-ts-mode-hook '+treesit-custom-colors-mode)
+(add-hook 'typescript-ts-mode-hook '+treesit-custom-colors-mode)
+(add-hook 'tsx-ts-mode-hook '+treesit-custom-colors-mode)
 #+end_src
 
 * Prog Modes
@@ -3722,24 +3742,6 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 (defun ey/c-mode-hooks ()
   (electric-indent-local-mode 1)
   (indent-tabs-mode -1))
-
-(defun +treesit-set-font-lock-feature-list-c-like ()
-  (setq-local treesit-font-lock-feature-list
-              '(( comment definition)
-                ( keyword string type directives)
-                ( constant escape-sequence expression literal property function bracket)
-                ( delimiter error operator property variable)))
-  (treesit-font-lock-recompute-features))
-
-(defun +treesit-set-font-lock-feature-list-js-like ()
-  (setq-local treesit-font-lock-level 4)
-  ;; (setq-local treesit-font-lock-feature-list ; prefer font-lock-level 4
-  ;;             '(( comment document definition)
-  ;;               ( keyword string)
-  ;;               ( assignment constant escape-sequence jsx number
-  ;;                            pattern string-interpolation function)
-  ;;               ( bracket delimiter operator property)))
-  (treesit-font-lock-recompute-features))
 
 (add-hook 'prog-mode-hook #'ey/c-mode-hooks)
 (add-hook 'prog-mode-hook #'yas-minor-mode)
@@ -3857,19 +3859,12 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 ;;   :config (clang-format-on-save-mode))
 #+end_src
 
-** Csharp TS Mode
-#+begin_src emacs-lisp
-(add-hook 'csharp-ts-mode-hook #'+treesit-set-font-lock-feature-list-c-like)
-#+end_src
-
 ** JS Mode
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package js
   :ensure nil
   :config
   (setq js-indent-level 2))
-
-(add-hook 'js-ts-mode-hook #'+treesit-set-font-lock-feature-list-js-like)
 #+end_src
 
 * Spelling
@@ -4741,22 +4736,6 @@ delete."
 
 (start-garbage-collection-timer)
 ;; (end-garbage-collection-timer)
-#+end_src
-
-* Suppress TreeSit Minor Mode
-#+begin_src emacs-lisp :tangle post-init.el
-(define-minor-mode +treesit-better-colors-mode
-  "Remap the face variables so they are not too shiny (especially when
-`treesit-font-lock-level' is 4)."
-  :local t
-  :init-value nil
-  (if +treesit-better-colors-mode
-      (setq font-lock-variable-name-face-cookie
-            (face-remap-add-relative 'font-lock-variable-name-face 'default))
-    (face-remap-remove-relative font-lock-variable-name-face-cookie)))
-
-(add-hook 'c-ts-mode-hook #'+treesit-better-colors-mode)
-(add-hook 'python-ts-mode-hook #'+treesit-better-colors-mode)
 #+end_src
 
 * Purr
