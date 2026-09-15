@@ -3509,6 +3509,7 @@ With non-nil prefix INCLUDE-ROOT, also include the project's root."
 
 * TODO Workspaces
 https://github.com/mclear-tools/tabspaces
+https://github.com/jamescherti/easysession.el
 https://github.com/florommel/bufferlo
 https://github.com/alphapapa/burly.el
 https://github.com/wasamasa/eyebrowse
