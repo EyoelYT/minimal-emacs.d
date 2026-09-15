@@ -4665,6 +4665,7 @@ delete."
  "t C" '(ey/toggle-center-buffer-content           :which-key "toggle center buffer content")
  "t B" '(global-blamer-mode                        :which-key "toggle global blamer mode")
  "t l" '(display-line-numbers-mode                 :which-key "toggle line numbers")
+ "t L" '(global-display-line-numbers-mode          :which-key "toggle global line numbers")
  "t v" '(visible-mode                              :which-key "toggle visibility")
  "t s" '(jinx-mode                                 :which-key "toggle local spell checks")
  "t S" '(global-jinx-mode                          :which-key "toggle global spell checks"))
