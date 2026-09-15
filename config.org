@@ -3758,6 +3758,7 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 (add-hook 'c++-ts-mode-hook '+treesit-custom-colors-mode)
 (add-hook 'typescript-ts-mode-hook '+treesit-custom-colors-mode)
 (add-hook 'tsx-ts-mode-hook '+treesit-custom-colors-mode)
+(add-hook 'odin-ts-mode-hook '+treesit-custom-colors-mode)
 #+end_src
 
 * Prog Modes
