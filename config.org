@@ -1342,8 +1342,8 @@ scaling"
 (use-package autorevert
   ;; revert buffers when their files/state have changed
   :ensure nil
-  :hook (focus-in . doom-auto-revert-buffers-h)
-  :hook (after-save . doom-auto-revert-buffers-h)
+  ;; :hook (focus-in . doom-auto-revert-buffers-h) ; FIXME: may need to use `after-focus-change-function'
+  ;; :hook (after-save . doom-auto-revert-buffers-h)
   :hook (doom-switch-buffer . doom-auto-revert-buffer-h)
   :hook (doom-switch-window . doom-auto-revert-buffer-h)
   :config
