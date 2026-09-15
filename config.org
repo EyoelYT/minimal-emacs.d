@@ -608,7 +608,8 @@ at the values with which this function was called."
         org-clock-clocktable-default-properties (list :maxlevel 6 :narrow nil)
         org-duration-format (quote h:mm)
         org-startup-indented t
-        org-agenda-files '("~/temp_agenda.org")
+        org-hide-emphasis-markers nil
+        ;; org-agenda-files '("~/temp_agenda.org")
         org-refile-targets '((nil :maxlevel . 2)
                              (org-agenda-files :maxlevel . 2))
         org-refile-use-outline-path 'file
@@ -623,14 +624,24 @@ at the values with which this function was called."
   (add-hook 'org-mode-hook #'org-indent-mode)
   (add-hook 'org-mode-hook #'visual-wrap-prefix-mode)
 
-  ;; automatically tangle emacs config from config.org
   (defun auto-org-babel-tangle-config ()
+    "Automatically tangle emacs config from config.org."
     (when (string-equal (buffer-file-name)
                         (expand-file-name "config.org" minimal-emacs-user-directory))
+      (require 'org)
       (let ((org-confirm-babel-evaluate))
         (org-babel-tangle))))
 
-  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'auto-org-babel-tangle-config)))
+  (defun auto-org-babel-tangle-async ()
+    "Tangle the current Org file asynchronously in the background."
+    (let ((file (buffer-file-name)))
+      (message "Tangling %s in the background..." (file-name-nondirectory file))
+      (async-start
+       `(lambda ()
+          (require 'org)
+          (org-babel-tangle-file ,file))
+       (lambda (result)
+         (message "Tangling complete!")))))
 
   (with-no-warnings
     (custom-declare-face '+org-todo-active  '((t (:inherit (bold font-lock-constant-face org-todo)))) "")
@@ -4819,3 +4830,7 @@ org clock to csv for example
 #+begin_src emacs-lisp :tangle post-init.el
 #+end_src
 
+* File Local Variables
+# Local Variables:
+# eval: (add-hook 'after-save-hook #'auto-org-babel-tangle-async nil t)
+# End:
