@@ -3978,6 +3978,7 @@ delete."
     (ghostel-send-key "d" "meta"))
   :config
   (evil-define-key 'motion ghostel-semi-char-mode-map (kbd "C-a") 'doom/backward-to-bol-or-indent)
+  (evil-define-key 'motion ghostel-semi-char-mode-map (kbd "C-s") 'ey/window-search)
   (evil-define-key '(motion insert) ghostel-semi-char-mode-map (kbd "C-S-<backspace>") 'e/evil-ghostel-kill-word))
 
 (use-package ghostel-eshell
