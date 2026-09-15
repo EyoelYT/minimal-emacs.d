@@ -2915,7 +2915,7 @@ is non-nil, move the window to the other end of the frame. Inverts
 Also add the value to the front of the list in the variable `values'."
   (interactive
    (let ((selection
-          (if (region-active-p)
+          (if (use-region-p)
               (buffer-substring-no-properties (region-beginning) (region-end))
             nil)))
      (list (read--expression "Eval: " selection) current-prefix-arg)))
