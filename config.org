@@ -2771,7 +2771,7 @@ all hooks after it are ignored.")
   (save-some-buffers (not compilation-ask-about-save)
                      compilation-save-buffers-predicate)
   (setq-default compilation-directory default-directory)
-  (compilation-start command comint))
+  (compilation-start command (not comint)))
 #+end_src
 
 ** Change into Insert State Advice
