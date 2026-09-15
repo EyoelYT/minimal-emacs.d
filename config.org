@@ -3225,7 +3225,7 @@ are normalized to charwise."
    ((and current-prefix-arg)
     (browse-url (concat "https://www.google.com/search?q=" (url-hexify-string query))))
    (t
-    (browse-url (concat "https://www.google.com/search?q=" (url-hexify-string query) "&udm=50&ie=UTD-8")))))
+    (browse-url (concat "https://www.google.com/search?q=" (url-hexify-string query) "&udm=50&ie=UTF-8")))))
 #+end_src
 
 ** Find file under selection
