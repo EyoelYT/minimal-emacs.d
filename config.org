@@ -3719,7 +3719,8 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
   (when +treesit-custom-colors-mode
     (setq +treesit-mute-cookies
           (list (face-remap-add-relative 'font-lock-variable-use-face 'default)
-                (face-remap-add-relative 'font-lock-property-use-face 'default)))))
+                (face-remap-add-relative 'font-lock-property-use-face 'default)
+                (face-remap-add-relative 'font-lock-function-call-face 'default)))))
 
 (add-hook 'c-ts-mode-hook #'+treesit-custom-colors-mode)
 (add-hook 'python-ts-mode-hook '+treesit-custom-colors-mode)
