@@ -4716,6 +4716,7 @@ delete."
  "p l" '(magit-project-log-all-branches :which-key "magit-project-log-all-branches")
  "g =" '(diff-hl-show-hunk              :which-key "diff-hl-show-hunk")
  "g s" '(diff-hl-stage-current-hunk     :which-key "diff-hl-stage-current-hunk")
+ "g x" '(diff-hl-revert-hunk            :which-key "diff-hl-revert-hunk")
  "g d" '(diff-hl-revert-hunk            :which-key "diff-hl-revert-hunk"))
 #+end_src
 
