@@ -1102,7 +1102,7 @@ otherwise in default state."
 (use-package diff-hl
   :ensure (:host github :repo "dgutov/diff-hl")
   :hook (elpaca-after-init . global-diff-hl-mode)
-  :hook (diff-hl-mode . diff-hl-flydiff-mode)
+  ;; :hook (diff-hl-mode . diff-hl-flydiff-mode)
   :commands diff-hl-stage-current-hunk diff-hl-revert-hunk diff-hl-next-hunk diff-hl-previous-hunk diff-hl-bmp-max-width
   :config
   (setq diff-hl-global-modes '(not image-mode pdf-view-mode))
@@ -1111,7 +1111,7 @@ otherwise in default state."
   ;; PERF: Slightly more conservative delay before updating the diff
   (setq diff-hl-flydiff-delay 0.5)  ; default: 0.3
   ;; PERF: don't block Emacs when updating vc gutter
-  (setq diff-hl-update-async nil)
+  (setq diff-hl-update-async t)
   ;; UX: get realtime feedback in diffs after staging/unstaging hunks.
   (setq diff-hl-show-staged-changes nil)
 
@@ -1123,9 +1123,9 @@ otherwise in default state."
 
   ;; UX: Refresh gutter in the selected buffer on ESC, switching windows, or
   ;;   refocusing the frame.
-  (add-hook 'doom-escape-hook #'+diff-hl-update-h)
-  (add-hook 'doom-switch-window-hook #'+diff-hl-update-h)
-  (add-hook 'doom-switch-frame-hook #'+diff-hl-update-h)
+  ;; (add-hook 'doom-escape-hook #'+diff-hl-update-h)
+  ;; (add-hook 'doom-switch-window-hook #'+diff-hl-update-h)
+  ;; (add-hook 'doom-switch-frame-hook #'+diff-hl-update-h)
 
   ;; UX: Don't delete the current hunk's indicators while we're editing
   (defun +diff-hl-init-flydiff-mode-h ()
