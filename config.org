@@ -288,7 +288,7 @@ or aliases."
 (set-fringe-mode 1)
 (repeat-mode 1)
 (winner-mode 1)
-(blink-cursor-mode 1)
+(blink-cursor-mode -1)
 ;; (electric-pair-mode 1)
 (column-number-mode 1)
 ;; (global-display-line-numbers-mode t)
@@ -427,6 +427,7 @@ at the values with which this function was called."
   (evil-set-initial-state 'shell-command-mode 'normal)
   (evil-set-initial-state 'minibuffer-mode 'insert)
   (setq evil-insert-state-cursor 'box)
+  (setq evil-operator-state-cursor 'box)
   (setq evil-echo-state nil)
 
   (with-eval-after-load 'evil-maps
