@@ -4744,36 +4744,36 @@ delete."
 #+begin_src emacs-lisp :tangle post-init.el
 ;; Make gc pauses faster by decreasing the threshold.
 ;; (setq gc-cons-threshold (* 2 1000 1000))
-
-(defvar gc-memory-limit (* (memory-limit) 1024)
-  "Maximum amount of memory before garbage-collecting")
-;; (defvar gc-memory-limit most-positive-fixnum)
-
-(defun gc-on-minibuffer-setup ()
-  (setq gc-cons-threshold gc-memory-limit))
-
-(defun gc-on-minibuffer-exit ()
-  (setq gc-cons-threshold gc-memory-limit))
-
-(add-hook 'minibuffer-setup-hook #'gc-on-minibuffer-setup)
-(add-hook 'minibuffer-exit-hook #'gc-on-minibuffer-exit)
-
-(setq gc-cons-threshold gc-memory-limit)
-
-(defvar gc-garbage-collection-timer nil
-  "Timer object for holding a garbage collection timer")
-
-(defun start-garbage-collection-timer ()
-  (if (not gc-garbage-collection-timer)
-      (setq gc-garbage-collection-timer
-            (run-with-idle-timer 1.2 t 'garbage-collect))))
-
-(defun end-garbage-collection-timer ()
-  (if gc-garbage-collection-timer
-      (progn (cancel-timer gc-garbage-collection-timer)
-             (setq gc-garbage-collection-timer nil))))
-
-(start-garbage-collection-timer)
+;;
+;; (defvar gc-memory-limit (* (memory-limit) 1024)
+;;   "Maximum amount of memory before garbage-collecting")
+;; ;; (defvar gc-memory-limit most-positive-fixnum)
+;;
+;; (defun gc-on-minibuffer-setup ()
+;;   (setq gc-cons-threshold gc-memory-limit))
+;;
+;; (defun gc-on-minibuffer-exit ()
+;;   (setq gc-cons-threshold gc-memory-limit))
+;;
+;; (add-hook 'minibuffer-setup-hook #'gc-on-minibuffer-setup)
+;; (add-hook 'minibuffer-exit-hook #'gc-on-minibuffer-exit)
+;;
+;; (setq gc-cons-threshold gc-memory-limit)
+;;
+;; (defvar gc-garbage-collection-timer nil
+;;   "Timer object for holding a garbage collection timer")
+;;
+;; (defun start-garbage-collection-timer ()
+;;   (if (not gc-garbage-collection-timer)
+;;       (setq gc-garbage-collection-timer
+;;             (run-with-idle-timer 1.2 t 'garbage-collect))))
+;;
+;; (defun end-garbage-collection-timer ()
+;;   (if gc-garbage-collection-timer
+;;       (progn (cancel-timer gc-garbage-collection-timer)
+;;              (setq gc-garbage-collection-timer nil))))
+;;
+;; (start-garbage-collection-timer)
 ;; (end-garbage-collection-timer)
 #+end_src
 
