@@ -3860,6 +3860,14 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
   (setq js-indent-level 2))
 #+end_src
 
+** Odin
+#+begin_src emacs-lisp :tangle post-init.el
+(use-package odin-ts-mode
+  :ensure (:host github :repo "Sampie159/odin-ts-mode")
+  :defer t
+  :mode "\\.odin\\'")
+#+end_src
+
 * Spelling
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package jinx
