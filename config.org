@@ -1517,9 +1517,25 @@ Else do `vertico-exit'."
   (setq vertico-count-format '("%-7s " . "%s/%s"))
   (setq vertico-resize nil)
   (setq vertico-cycle t)
-  (setq vertico-flat-max-lines 2)
+  (setq vertico-flat-max-lines 4)
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
-  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
+  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
+  ;; (setq vertico-flat-format               ; remove space
+  ;;       '(:multiple #("{%s}" 0 1 (face minibuffer-prompt) 3 4 (face minibuffer-prompt) 0 1 (cursor t))
+  ;;         :single   #("[%s]" 0 1 (face minibuffer-prompt) 3 4 (face minibuffer-prompt) 0 1 (cursor t))
+  ;;         :prompt   #("(%s)" 0 1 (face minibuffer-prompt) 3 4 (face minibuffer-prompt) 0 1 (cursor t))
+  ;;         :separator #(" | " 0 3 (face minibuffer-prompt))
+  ;;         :ellipsis  #("..." 0 3 (face minibuffer-prompt))
+  ;;         :no-match  #("[No match]" 0 1 (cursor t))
+  ;;         :spacer    #("")))
+  (setq vertico-flat-format
+        '(:multiple   #("{%s}" 0 1 (face minibuffer-prompt) 3 4 (face minibuffer-prompt))
+          :single     #("[%s]" 0 1 (face minibuffer-prompt) 1 3 (face success) 3 4 (face minibuffer-prompt))
+          :prompt     #("(%s)" 0 1 (face minibuffer-prompt) 3 4 (face minibuffer-prompt))
+          :separator  #(" | " 0 3 (face minibuffer-prompt))
+          :ellipsis   #("…" 0 1 (face minibuffer-prompt))
+          :no-match   "[No match]"
+          :spacer     #(" " 0 1 (cursor t)))))
 
 (use-package vertico-multiform
   :ensure nil
