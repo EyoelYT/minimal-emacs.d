@@ -4737,6 +4737,42 @@ delete."
   :defer t)
 #+end_src
 
+* Current
+#+begin_src emacs-lisp :tangle post-init.el
+(defvar current-act nil
+  "The house of the current act.")
+
+;; (defvar current-act-modeline-format
+;;   '(:eval (propertize (format " [CA: %s]" current-act)
+;;                       'face 'bold
+;;                       'help-echo "The Current Act")))
+
+(defun current-act-set (act)
+  "Set the `current-act'."
+  (interactive (let ((selected-text (if (use-region-p)
+                                        (buffer-substring-no-properties
+                                         (region-beginning) (region-end)))))
+                 (list (read-string "set current act: " selected-text))))
+  (setq current-act act)
+  (force-mode-line-update t)
+  (message "Current act updated to: %s" act))
+
+(defun current-act-unset ()
+  "Unset the `current-act'"
+  (interactive)
+  (setq current-act nil))
+
+(defun current-act-show-in-minibuffer ()
+  "Display the `current-act' in the minibuffer."
+  (interactive)
+  (message "Current Act: %s" current-act))
+
+(define-leader-keys
+  "A s" 'current-act-set
+  "A m" 'current-act-show-in-minibuffer
+  "A u" 'current-act-unset)
+#+end_src
+
 * Modeline Invisible Mode                                               :ppr:
 #+begin_src emacs-lisp :tangle post-init.el
 (defcustom global-mode-line-invisible-mode-excluded-modes '()
