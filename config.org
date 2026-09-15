@@ -1641,6 +1641,12 @@ Else do `vertico-exit'."
 (use-package tangonov-theme
   :ensure (:host codeberg :repo "trevdev/tangonov-theme"))
 (use-package catppuccin-theme)
+;; I like modus based themes, they cover a lot more faces
+(use-package folio-theme :ensure (:host github :repo "kn66/folio-theme.el"))
+(use-package kusanagi-theme :ensure (:host github :repo "LionyxML/kusanagi-theme"))
+(use-package peppers-theme :ensure (:host codeberg :repo "joar/peppers-theme"))
+(use-package modus-nordic-night :ensure (:host codeberg :repo "ashton314/modus-nordic-night"
+                                               :main "modus-nordic-night-theme.el"))
 #+end_src
 
 * Modus Themes
