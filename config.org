@@ -1603,10 +1603,10 @@ Else do `vertico-exit'."
 (use-package white-theme)
 (use-package ubuntu-theme)
 (use-package naysayer-theme)
-(use-package kanagawa-themes
-  :ensure (:host github :repo "EyoelYT/kanagawa-emacs")
-  :config
-  (setq kanagawa-themes-org-height nil))
+;; (use-package kanagawa-themes
+;;   :ensure (:host github :repo "EyoelYT/kanagawa-emacs")
+;;   :config
+;;   (setq kanagawa-themes-org-height nil)) ;; ERROR: inheritance cycle error
 (use-package standard-themes)
 (use-package stimmung-themes)
 (use-package arjen-grey-theme)
