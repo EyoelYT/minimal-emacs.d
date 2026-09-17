@@ -453,8 +453,9 @@ at the values with which this function was called."
   :init
   (setq evil-collection-want-unimpaired-p nil)
   :config
-  (setq evil-collection-want-find-usages-bindings t)
-  (setq evil-collection-binding-overrides
+  (setq evil-collection-want-find-usages-bindings t
+        evil-collection-magit-use-z-for-folds t
+        evil-collection-binding-overrides
         '((repl-submit :enabled nil)
           (repl-newline :enabled nil)))
   (when (featurep 'consult)
@@ -1042,7 +1043,6 @@ Fixes doomemacs/core#3939: unsortable dired entries on Windows."
 
 (use-package magit
   :ensure (:wait t)
-  :demand t
   :init (setq magit-auto-revert-mode nil)
   :commands (magit-status magit-file-delete)
   :config
@@ -4402,29 +4402,30 @@ delete."
   (define-key magit-section-mode-map  (kbd "M-1")         nil) ; remove bindings to give way to tab-bar-mode bindings M-<digit>
   (define-key magit-section-mode-map  (kbd "M-2")         nil)
   (define-key magit-section-mode-map  (kbd "M-3")         nil)
-  (define-key magit-section-mode-map  (kbd "M-4")         nil)
-  (when (featurep 'evil)
-    (evil-define-key* '(normal) magit-section-mode-map
-      (kbd "M-1")         nil
-      (kbd "M-2")         nil
-      (kbd "M-3")         nil
-      (kbd "M-4")         nil
-      (kbd "C-S-<tab>")  'magit-section-cycle-global
-      (kbd "S-<tab>")    'magit-section-cycle
-      (kbd "C-<tab>")    'evil-switch-to-windows-last-buffer
-      (kbd "<backtab>")  'magit-section-cycle
-      (kbd "C-S-<down>") 'magit-section-forward
-      (kbd "C-S-<up>")   'magit-section-backward
-      (kbd "M-RET")      'magit-diff-visit-worktree-file-other-window
-      (kbd "S-<return>") 'magit-diff-visit-worktree-file-other-window)
-    (evil-define-key* '(normal visual) magit-mode-map
-      "zm"  'magit-section-show-level-2-all
-      "zr"  'magit-section-show-level-4-all
-      "zz"  'evil-scroll-line-to-center
-      "zt"  'evil-scroll-line-to-top
-      "zb"  'evil-scroll-line-to-bottom
-      "C-j" 'magit-section-forward
-      "C-k" 'magit-section-backward)))
+  (define-key magit-section-mode-map  (kbd "M-4")         nil))
+
+(with-eval-after-load 'evil-collection-magit
+  (evil-define-key* '(normal) magit-section-mode-map
+    (kbd "M-1")         nil
+    (kbd "M-2")         nil
+    (kbd "M-3")         nil
+    (kbd "M-4")         nil
+    (kbd "C-S-<tab>")  'magit-section-cycle-global
+    (kbd "S-<tab>")    'magit-section-cycle
+    (kbd "C-<tab>")    'evil-switch-to-windows-last-buffer
+    (kbd "<backtab>")  'magit-section-cycle
+    (kbd "C-S-<down>") 'magit-section-forward
+    (kbd "C-S-<up>")   'magit-section-backward
+    (kbd "M-RET")      'magit-diff-visit-worktree-file-other-window
+    (kbd "S-<return>") 'magit-diff-visit-worktree-file-other-window)
+  (evil-define-key* '(normal visual) magit-mode-map
+    "zm"  'magit-section-show-level-2-all
+    "zr"  'magit-section-show-level-4-all
+    "zz"  'evil-scroll-line-to-center
+    "zt"  'evil-scroll-line-to-top
+    "zb"  'evil-scroll-line-to-bottom
+    "C-j" 'magit-section-forward
+    "C-k" 'magit-section-backward))
 
 (with-eval-after-load 'transient
   (define-key transient-map (kbd "<escape>") 'transient-quit-one))
