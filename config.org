@@ -2990,28 +2990,27 @@ input and search the whole buffer for it."
 
 ** Search Project (with consult)
 #+begin_src emacs-lisp :tangle post-init.el
-(defun ey/consult-search-project (&optional arg)
+(defun ey/consult-search-project ()
   "Conduct a text search in the current project root. If not in a project,
 conduct a text search from the current directory"
-  (interactive "P")
+  (interactive)
   (let ((selected-text (when (region-active-p)
                          (buffer-substring-no-properties (region-beginning) (region-end)))))
-    (if (project-current)
+    (if (project-current)               ; REVIEW: we can maybe directly use consult-ripgrep here
         (consult-ripgrep (project-root (project-current)) selected-text)
       (ey/consult-ripgrep-cwd))))
 
-(defun ey/consult-search-other-project (&optional arg)
-  "Conduct a text search from the root of the selected project in the
-completing read. If not in a project, conduct a text search from the
-current directory"
-  (interactive "P")
-  (let* ((selected-text (when (region-active-p)
-                          (buffer-substring-no-properties (region-beginning) (region-end))))
-         (projects (project-known-project-roots)))
-    (if projects
-        (let ((project-dir (completing-read "Search in project: " projects nil t)))
-          (consult-ripgrep project-dir selected-text))
-      (user-error "There are no known projects"))))
+(defun ey/consult-search-other-project ()
+  "Conduct a text search from the root of a known project. If there are no
+known projects, throw an error."
+  (interactive)
+  (if (not (project-known-project-roots))
+      (user-error "There are no known projects")
+    (let* ((selected-text (when (region-active-p)
+                            (buffer-substring-no-properties (region-beginning) (region-end))))
+           (project-dir (project-prompt-project-dir)))
+      (when (and project-dir (not (string-empty-p project-dir)))
+        (consult-ripgrep project-dir selected-text)))))
 #+end_src
 
 ** Backward to first non blank || beg of line (stolen from doom emacs)
