@@ -783,12 +783,12 @@ at the values with which this function was called."
  '(mode-line-active ((t (:inherit (mode-line)))))
  '(mode-line-inactive ((t (:inherit (mode-line)))))
  '(font-lock-comment-face ((t (:slant unspecified)))) ; disable italic in comments
+ `(line-number-current-line ((t (:background ,(face-attribute 'line-number :background)))))
  ;; '(font-lock-comment-face nil) ; enable italic in comments
  '(italic ((t (:slant unspecified)))) ; disable italic
  ;; '(bold nil) ; enable bold
  '(bold ((t (:weight unspecified)))) ; disable bold
  )
-;; (face-remap-reset-base font-lock-preprocessor-face)
 
 (defun ey/set-custom-face-attributes-a (&rest _)
   ;; set background of current line number to the same as the background of the default face
