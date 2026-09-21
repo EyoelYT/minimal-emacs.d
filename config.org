@@ -2732,6 +2732,43 @@ root. If the buffer already exists, surface that buffer instead"
   (user-error "There are no known projects")))
 #+end_src
 
+** Magit Window functions
+#+begin_src emacs-lisp :tangle post-init.el
+(defun magit-fetch-from-upstream-all-windows ()
+  "Loop over all visible windows in the current frame,and if the buffer is
+in `magit-mode`, fetch from upstream."
+  (interactive)
+  (let ((processed-dirs '()))
+    (dolist (win (window-list))
+      (let ((buf (window-buffer win)))
+        (with-current-buffer buf
+          (if (and (derived-mode-p 'magit-mode)
+                   (not (member default-directory processed-dirs)))
+              (progn
+                (push default-directory processed-dirs)
+                (magit-with-toplevel
+                  (message "Fetching for %s" (buffer-name buf))
+                  (call-interactively #'magit-fetch-from-upstream)))
+            (message "Skipping %s" (buffer-name buf))))))))
+
+(defun magit-pull-from-upstream-all-windows ()
+  "Loop over all visible windows in the current frame,and if the buffer is
+in `magit-mode`, pull from upstream."
+  (interactive)
+  (let ((processed-dirs '()))
+    (dolist (win (window-list))
+      (let ((buf (window-buffer win)))
+        (with-current-buffer buf
+          (if (and (derived-mode-p 'magit-mode)
+                   (not (member default-directory processed-dirs)))
+              (progn
+                (push default-directory processed-dirs)
+                (magit-with-toplevel
+                  (message "Pulling for %s" (buffer-name buf))
+                  (call-interactively #'magit-pull-from-upstream)))
+            (message "Skipping %s" (buffer-name buf))))))))
+#+end_src
+
 ** Escape Key
 #+begin_src emacs-lisp :tangle post-init.el
 (with-eval-after-load 'evil
