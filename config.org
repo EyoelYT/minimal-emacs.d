@@ -4093,35 +4093,37 @@ delete."
 
 ** Org Mappings
 #+begin_src emacs-lisp :tangle post-init.el
-(with-eval-after-load 'evil
-  (with-eval-after-load 'org
-    (evil-define-key '(normal visual insert replace motion operator emacs) org-mode-map (kbd "C-a") 'org-beginning-of-line)
-    (evil-define-key '(insert replace emacs) org-mode-map (kbd "C-e") 'org-end-of-line)
-    (evil-define-key '(motion) org-agenda-mode-map (kbd "S-<up>") 'scroll-down-line)
-    (evil-define-key '(motion) org-agenda-mode-map (kbd "S-<down>") 'scroll-up-line)
-    (evil-define-key '(motion) org-agenda-mode-map (kbd "S-<left>") 'evil-scroll-left)
-    (evil-define-key '(motion) org-agenda-mode-map (kbd "S-<right>") 'evil-scroll-right)
-    (evil-define-key '(motion) org-mode-map (kbd "S-<up>") 'scroll-down-line)
-    (evil-define-key '(motion) org-mode-map (kbd "S-<down>") 'scroll-up-line)
-    (evil-define-key '(motion) org-mode-map (kbd "S-<left>") 'evil-scroll-left)
-    (evil-define-key '(motion) org-mode-map (kbd "S-<right>") 'evil-scroll-right)
-    (evil-define-key '(normal) org-mode-map (kbd "S-<tab>") 'ey/org-cycle-subtree-recursively)
-    (evil-define-key '(normal) org-mode-map (kbd "C-S-<tab>") 'org-shifttab)
-    (evil-define-key '(insert) org-mode-map (kbd "S-<left>") 'org-shiftleft)
-    (evil-define-key '(insert) org-mode-map (kbd "S-<right>") 'org-shiftright)
-    (evil-define-key '(normal) org-mode-map (kbd "<backspace>") 'evil-delete-backward-char-and-join)
-    (define-key org-src-mode-map (kbd "C-c C-c") 'org-edit-src-exit)
-    (define-key org-mode-map (kbd "C-c C-'") 'org-edit-special)
-    (define-key org-mode-map (kbd "C-<return>") '+org/insert-item-below)
-    (define-key org-mode-map (kbd "C-S-<return>") '+org/insert-item-above)
-    (define-key org-mode-map [C-return] '+org/insert-item-below)
-    (define-key org-mode-map [C-S-return] '+org/insert-item-above)
-    (evil-define-key '(normal visual insert motion emacs replace operator) org-mode-map (kbd "C-a") 'doom/backward-to-bol-or-indent) ; fixes C-a maps to `evil-paste-after'
+
+(with-eval-after-load 'org
+  (define-key org-src-mode-map (kbd "C-c C-c") 'org-edit-src-exit)
+  (define-key org-mode-map (kbd "C-c C-'") 'org-edit-special)
+  (define-key org-mode-map (kbd "C-<return>") '+org/insert-item-below)
+  (define-key org-mode-map (kbd "C-S-<return>") '+org/insert-item-above)
+  (define-key org-mode-map [C-return] '+org/insert-item-below)
+  (define-key org-mode-map [C-S-return] '+org/insert-item-above))
+
+(with-eval-after-load 'evil-collection-org
+  (evil-define-key '(insert replace emacs) org-mode-map (kbd "C-e") 'org-end-of-line)
+  (evil-define-key '(motion) org-agenda-mode-map (kbd "S-<up>") 'scroll-down-line)
+  (evil-define-key '(motion) org-agenda-mode-map (kbd "S-<down>") 'scroll-up-line)
+  (evil-define-key '(motion) org-agenda-mode-map (kbd "S-<left>") 'evil-scroll-left)
+  (evil-define-key '(motion) org-agenda-mode-map (kbd "S-<right>") 'evil-scroll-right)
+  (evil-define-key '(motion) org-mode-map (kbd "S-<up>") 'scroll-down-line)
+  (evil-define-key '(motion) org-mode-map (kbd "S-<down>") 'scroll-up-line)
+  (evil-define-key '(motion) org-mode-map (kbd "S-<left>") 'evil-scroll-left)
+  (evil-define-key '(motion) org-mode-map (kbd "S-<right>") 'evil-scroll-right)
+  (evil-define-key '(insert) org-mode-map (kbd "S-<left>") 'org-shiftleft)
+  (evil-define-key '(insert) org-mode-map (kbd "S-<right>") 'org-shiftright)
+  (evil-define-key '(normal) org-mode-map (kbd "<backspace>") 'evil-delete-backward-char-and-join)
+  (evil-define-key '(normal visual insert motion emacs replace operator) org-mode-map (kbd "C-a") 'doom/backward-to-bol-or-indent) ; fixes C-a maps to `evil-paste-after'
                                         ; also fixes org-beginning-of-line in src-blocks
-    (evil-define-key '(normal visual motion) org-mode-map (kbd "gl") 'evil-lion-left))
-  (with-eval-after-load 'evil-org
-    (evil-define-key 'normal 'evil-org-mode (kbd "C-<return>") '+org/insert-item-below)
-    (evil-define-key 'normal 'evil-org-mode (kbd "C-S-<return>") '+org/insert-item-above)))
+  (evil-define-key '(normal visual motion) org-mode-map (kbd "gl") 'evil-lion-left))
+
+(with-eval-after-load 'evil-org
+  (evil-define-key '(normal) org-mode-map (kbd "C-S-<tab>") 'org-shifttab)
+  (evil-define-key '(normal) org-mode-map (kbd "S-<tab>") 'ey/org-cycle-subtree-recursively)
+  (evil-define-key 'normal 'evil-org-mode (kbd "C-<return>") '+org/insert-item-below)
+  (evil-define-key 'normal 'evil-org-mode (kbd "C-S-<return>") '+org/insert-item-above))
 
 (define-leader-keys
   "o A"   'org-agenda
