@@ -1953,21 +1953,6 @@ into account.")
   (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
 #+end_src
 
-* Markdown
-#+begin_src emacs-lisp :tangle post-init.el
-;; (use-package markdown-mode ; FIXME: replace with `markdown-ts-mode'
-;;   :defer t
-;;   ;; :mode ("README\\.md\\'" . gfm-mode)
-;;   :init (setq markdown-command "multimarkdown")
-;;   :config
-;;   (setq markdown-fontify-code-blocks-natively t))
-
-(use-package markdown-indent-mode
-  :ensure (:host github :repo "whhone/markdown-indent-mode")
-  :hook (markdown-mode . markdown-indent-mode)
-  :hook (markdown-ts-mode . markdown-indent-mode))
-#+end_src
-
 * Uniline
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package uniline
