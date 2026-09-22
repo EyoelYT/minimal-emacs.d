@@ -606,8 +606,6 @@ at the values with which this function was called."
   :config
   (setq org-edit-src-content-indentation 0
         org-src-preserve-indentation nil
-        org-clock-clocktable-default-properties (list :maxlevel 6 :narrow nil)
-        org-duration-format (quote h:mm)
         org-startup-indented t
         org-hide-emphasis-markers nil
         ;; org-agenda-files '("~/temp_agenda.org")
@@ -620,7 +618,14 @@ at the values with which this function was called."
         org-M-RET-may-split-line nil
         org-insert-heading-respect-content t
         org-special-ctrl-a/e t
-        org-src-window-setup 'current-window)
+        org-src-window-setup 'current-window
+        org-duration-format (quote h:mm)
+        org-clock-out-remove-zero-time-clocks t
+        org-clock-clocktable-default-properties (list :maxlevel 6 :narrow nil)
+        org-clock-clocked-in-display nil
+        org-clock-persist t)
+
+  (org-clock-persistence-insinuate)
 
   (add-hook 'org-mode-hook #'org-indent-mode)
   (add-hook 'org-mode-hook #'visual-wrap-prefix-mode)
