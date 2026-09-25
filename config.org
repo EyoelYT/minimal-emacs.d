@@ -4243,15 +4243,16 @@ delete."
 ** Help Keymaps
 #+begin_src emacs-lisp :tangle post-init.el
 (define-leader-keys
- "h v" '(describe-variable :which-key "describe-variable")
- "h f" '(describe-function :which-key "describe-function")
- "h k" '(describe-key      :which-key "describe-key")
- "h F" '(describe-face     :which-key "describe-face")
- "h p" '(describe-package  :which-key "describe-package")
- "h o" '(describe-symbol   :which-key "describe-symbol")
- "h l" '(view-lossage      :which-key "view-lossage")
- "h i" '(info              :which-key "describe-info")
- "h m" '(describe-mode     :which-key "describe-mode"))
+ "h v" 'describe-variable
+ "h f" 'describe-function
+ "h k" 'describe-key
+ "h F" 'describe-face
+ "h p" 'describe-package
+ "h o" 'describe-symbol
+ "h l" 'view-lossage
+ "h i" 'info
+ "h m" 'describe-mode
+ "h M" 'describe-minor-mode)
 #+end_src
 
 ** Bookmarks
