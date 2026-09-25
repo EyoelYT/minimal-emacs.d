@@ -2066,14 +2066,15 @@ Prefix arg to do cpu+mem. Default runs cpu profiler."
 ** Fix fold toggler
 #+begin_src emacs-lisp :tangle post-init.el
 (defun +evil-toggle-fold-a (fn &rest args)
-  (if (bound-and-true-p hs-minor-mode)
+  "Use as around advice to toggle the fold always at eol."
+  (if (or (bound-and-true-p hs-minor-mode)
+          (bound-and-true-p treesit-fold-mode))
       (save-excursion
         (end-of-line)
         (apply fn args))
     (apply fn args)))
 
-;; (advice-add #'evil-toggle-fold :around #'+evil-toggle-fold-a)
-;; (advice-remove #'evil-toggle-fold #'+evil-toggle-fold-a)
+(advice-add #'evil-toggle-fold :around #'+evil-toggle-fold-a)
 #+end_src
 
 ** Windows Terminal
