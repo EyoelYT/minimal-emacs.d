@@ -4069,18 +4069,6 @@ delete."
   :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
 #+end_src
 
-* Bookmarks
-#+begin_src emacs-lisp :tangle post-init.el
-(use-package bookmark+
-  :ensure (:host github :repo "emacsmirror/bookmark-plus")
-  :after org
-  :defer t
-  :init
-  (setq bmkp-bookmark-map-prefix-keys          (list (kbd " b p"))
-        bmkp-jump-map-prefix-keys              (list (kbd " b j"))
-        bmkp-jump-other-window-map-prefix-keys (list (kbd " b w j"))))
-#+end_src
-
 * Bindings
 ** Evil Keybinds
 #+begin_src emacs-lisp :tangle post-init.el
