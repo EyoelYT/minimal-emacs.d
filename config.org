@@ -4081,6 +4081,15 @@ delete."
 
 * Ibuffer
 #+begin_src emacs-lisp :tangle post-init.el
+(with-eval-after-load 'ibuffer
+  (setq ibuffer-show-empty-filter-groups nil
+        ibuffer-filter-group-name-face '(:inherit (success bold))))
+
+(use-package ibuffer-vc
+  :ensure t
+  :defer t
+  :hook (ibuffer . ibuffer-vc-set-filter-groups-by-vc-root))
+
 (use-package nerd-icons-ibuffer
   :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
 #+end_src
