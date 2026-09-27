@@ -3766,9 +3766,9 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
           :tab-width 4
           :right-divider-width 17
           :fringe-width 10))
-  (setq spacious-padding-subtle-mode-line
-        '(:mode-line-active shadow :mode-line-inactive shadow))
-  ;; (setq spacious-padding-subtle-mode-line nil)
+  ;; (setq spacious-padding-subtle-mode-line
+  ;;       '(:mode-line-active shadow :mode-line-inactive shadow))
+  (setq spacious-padding-subtle-mode-line nil)
   )
 #+end_src
 
