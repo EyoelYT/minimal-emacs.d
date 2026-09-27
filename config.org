@@ -2712,6 +2712,42 @@ After search term is found, jump back"
     (call-interactively #'org-open-at-point)))
 #+end_src
 
+** Org Clock Functions
+#+begin_src emacs-lisp :tangle post-init.el
+(defun org-echo-all-clock-times ()
+  "Show current-clock and total-task clocked time in the echo area only
+(never logged to *Messages*)."
+  (interactive)
+  (if (not (org-clocking-p))
+      (let (message-log-max)
+        (message "No active Org clock running."))
+    (org-with-point-at org-clock-hd-marker
+      (let* ((fmt (lambda (mins)
+                    (if mins
+                        (format "%d:%02d" (/ mins 60) (% mins 60))
+                      "n/a")))
+             ;; Needed so the still-open CLOCK line is folded into the sum
+             ;; below, not just the closed "CLOCK: [ts]--[ts] => dur" lines.
+             (org-clock-report-include-clocking-task t)
+             (current (org-clock-get-clocked-time))
+             (task (save-excursion
+                     (save-restriction
+                       (org-narrow-to-subtree)
+                       (org-clock-sum 0 (float-time))
+                       org-clock-file-total-minutes)))
+             (output (mapconcat
+                      #'identity
+                      (list (format "Task:    %s" (org-no-properties org-clock-heading))
+                            (format "Current: %s" (funcall fmt current))
+                            (format "Total:   %s" (funcall fmt task)))
+                      "\n"))
+             (message-log-max))
+        (message output)))))
+
+(define-leader-keys
+  "s T" 'org-echo-all-clock-times)
+#+end_src
+
 ** FilePath Copy
 #+begin_src emacs-lisp :tangle post-init.el
 (defun +default/yank-buffer-path (&optional root)
