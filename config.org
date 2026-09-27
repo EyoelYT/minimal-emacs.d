@@ -4872,7 +4872,24 @@ Modes derived from an element of this list are also excluded."
 
 * Proj Packages
 org clock to csv for example
-#+begin_src emacs-lisp :tangle post-init.el
+#+begin_src emacs-lisp
+(use-package org-clock-to-csv
+  :ensure nil
+  :load-path "~/Projects/org-clock-to-csv"
+  :commands org-clock-to-csv-region)
+
+(use-package evmc
+  :ensure nil
+  :load-path "~/Projects/evmc")
+
+(use-package lorg
+  :ensure nil
+  :load-path "~/Projects/lorg"
+  :defer t
+  :commands (lorg-menu)
+  :config
+  (setq lorg-files '("~/Projects/code-zero/"))
+  (define-leader-keys "RET" 'lorg-menu))
 #+end_src
 
 * File Local Variables
