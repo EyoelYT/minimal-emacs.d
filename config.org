@@ -1973,6 +1973,13 @@ into account.")
   (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
 #+end_src
 
+* Markdown
+#+begin_src emacs-lisp :tangle post-init.el
+(use-package markdown-indent-mode
+  :ensure (:host github :repo "whhone/markdown-indent-mode")
+  :hook (markdown-ts-mode . markdown-indent-mode))
+#+end_src
+
 * Uniline
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package uniline
