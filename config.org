@@ -627,6 +627,8 @@ at the values with which this function was called."
 
   (org-clock-persistence-insinuate)
 
+  (add-to-list 'org-export-backends 'md)
+
   (add-hook 'org-mode-hook #'org-indent-mode)
   (add-hook 'org-mode-hook #'visual-wrap-prefix-mode)
 
@@ -712,6 +714,19 @@ at the values with which this function was called."
         org-appear-inside-latex t
         org-appear-autolinks t
         org-appear-autosubmarkers t))
+#+end_src
+
+* Org Export
+#+begin_src emacs-lisp :tangle post-init.el
+(use-package ox-pandoc
+  :ensure t
+  :if (executable-find "pandoc")
+  :after ox
+  :init
+  (add-to-list 'org-export-backends 'pandoc)
+  (setq org-export-with-smart-quotes t
+        org-html-validation-link nil
+        org-latex-prefer-user-labels t))
 #+end_src
 
 * TODO Org-Roam
