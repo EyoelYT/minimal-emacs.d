@@ -3944,6 +3944,14 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
   :mode "\\.odin\\'")
 #+end_src
 
+** Zig
+#+begin_src emacs-lisp :tangle post-init.el
+(use-package zig-ts-mode
+  :ensure (:host codeberg :repo "meow_king/zig-ts-mode")
+  :defer t
+  :mode "\\.zig\\'")
+#+end_src
+
 * Spelling
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package jinx
