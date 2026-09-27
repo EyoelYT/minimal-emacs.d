@@ -3805,6 +3805,13 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 (add-hook 'odin-ts-mode-hook '+treesit-custom-colors-mode)
 #+end_src
 
+* Folds
+#+begin_src emacs-lisp :tangle post-init.el
+(use-package treesit-fold
+  :ensure t
+  :defer t)
+#+end_src
+
 * Prog Modes
 ** Prog Modes General
 #+begin_src emacs-lisp :tangle post-init.el
