@@ -1676,7 +1676,13 @@ Else do `vertico-exit'."
 
 * Modus Themes
 #+begin_src emacs-lisp
-(use-package modus-themes)
+(use-package modus-themes
+  :ensure t
+  :defer t
+  :config
+  (setq modus-themes-bold-constructs t
+        modus-themes-italic-constructs t
+        modus-themes-slanted-constructs t))
 #+end_src
 
 * Set Theme
