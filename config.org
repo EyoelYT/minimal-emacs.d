@@ -261,6 +261,7 @@ or aliases."
 (setq confirm-kill-emacs 'y-or-n-p)
 
 (global-visual-wrap-prefix-mode 1)
+(global-completion-preview-mode 1)
 
 (setq use-dialog-box nil)
 (setq comment-empty-lines t)
