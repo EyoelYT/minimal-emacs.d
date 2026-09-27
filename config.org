@@ -1614,10 +1614,13 @@ Else do `vertico-exit'."
   :ensure (:host github :repo "doomemacs/themes" :wait t)
   :defer t
   :config
+  ;; REVIEW: inactive header line is ugly
+  ;; Can use sth like this to set better face: (set-face-attribute 'header-line-inactive nil :box `(:line-width 4 :color ,(face-attribute 'default :background) :style nil))
   ;; Global settings (defaults)
   (setq doom-gruvbox-dark-variant "hard"
-        doom-themes-enable-bold nil    ; if nil, bold is universally disabled
-        doom-themes-enable-italic nil) ; if nil, italics is universally disabled
+        doom-themes-padded-modeline t
+        doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
 
   ;; Enable flashing mode-line on errors
   ;; (doom-themes-visual-bell-config)
