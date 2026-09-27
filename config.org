@@ -2828,6 +2828,25 @@ in `magit-mode`, pull from upstream."
             (message "Skipping %s" (buffer-name buf))))))))
 #+end_src
 
+** TODO Diff Hl skip staged hunks
+#+begin_src emacs-lisp :tangle post-init.el
+(defun diff-hl-next-hunk (&optional backward) ; REVIEW: Not working
+  "Go to the beginning of the next unstaged hunk in the current buffer."
+  (interactive)
+  (let (overlay)
+    ;; Loop until a non-staged overlay is found or search returns nil
+    (while (and (setq overlay (diff-hl-search-next-hunk backward))
+                (overlay-get overlay 'diff-hl-stage))
+      ;; Move past this hidden hunk so the next iteration finds the next one
+      (goto-char (if backward (overlay-start overlay) (overlay-end overlay))))
+
+    (if (not overlay)
+        (user-error "No further unstaged hunks found")
+      (goto-char (overlay-start overlay))
+      (when diff-hl-next-previous-hunk-auto-recenter
+        (recenter)))))
+#+end_src
+
 ** Escape Key
 #+begin_src emacs-lisp :tangle post-init.el
 (with-eval-after-load 'evil
