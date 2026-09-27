@@ -1638,7 +1638,7 @@ Else do `vertico-exit'."
 (use-package ef-themes
   :config
   (setq ef-themes-mixed-fonts nil
-	ef-themes-variable-pitch-ui nil))
+	    ef-themes-variable-pitch-ui nil))
 #+end_src
 
 * Extra Themes
