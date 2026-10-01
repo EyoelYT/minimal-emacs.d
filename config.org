@@ -1923,6 +1923,7 @@ into account.")
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package compile
   :ensure nil
+  :defer t
   :config
   (setq compilation-always-kill t
         compilation-auto-jump-to-first-error nil
@@ -1930,7 +1931,9 @@ into account.")
         compilation-skip-threshold 2
         compilation-context-lines t
         ansi-color-for-compilation-mode t)
-  (add-hook 'compilation-filter-hook #'ansi-color-compilation-filter))
+  (add-hook 'compilation-filter-hook #'ansi-color-compilation-filter)
+  (add-to-list 'compilation-error-regexp-alist-alist '(odin "^\\([^ \t\n(]+\\)(\\([0-9]+\\):\\([0-9]+\\))" 1 2 3))
+  (add-to-list 'compilation-error-regexp-alist 'odin))
 
 (defun ey/toggle-compilation-jump-to-error ()
   "Cycle between compilation-mode settings"
