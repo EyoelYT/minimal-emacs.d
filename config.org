@@ -2060,7 +2060,9 @@ into account.")
   :ensure (:host github :repo "doomemacs/snippets")
   :after yasnippet
   :preface
-  (setq doom-snippets-dir (expand-file-name "sources/snippets/" elpaca-directory)))
+  (setq doom-snippets-dir (if (eq system-type 'windows-nt)
+                              (expand-file-name "repos/snippets/" elpaca-directory)
+                            (expand-file-name "sources/snippets/" elpaca-directory))))
 #+end_src
 
 * Custom Functions
