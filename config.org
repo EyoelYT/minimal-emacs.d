@@ -4096,7 +4096,7 @@ delete."
 * Ghostel
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package ghostel
-  :ensure t
+  :ensure (:host github :repo "dakra/ghostel")
   :hook (comint-mode . ghostel-comint-mode)
   :init
   ;; HACK: Done to lazy-load this package until first invocation.
