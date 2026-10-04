@@ -125,6 +125,7 @@
   :config
   (dired-async-mode 1))
 #+end_src
+
 * Compile Angel [No Tangle]
 #+begin_src emacs-lisp
 ;; Ensure adding the following compile-angel code at the very beginning
@@ -985,7 +986,13 @@ Fixes doomemacs/core#3939: unsortable dired entries on Windows."
                      (not ls-lisp-use-insert-directory-program)))
         (setq-local dired-actual-switches (car args))))
 
-    (add-hook 'dired-mode-hook #'+dired-disable-gnu-ls-flags-maybe-h)))
+    (add-hook 'dired-mode-hook #'+dired-disable-gnu-ls-flags-maybe-h))
+
+  (defun +recentf-add-dired-directory-h ()
+    "Add dired directories to recentf file list."
+    (recentf-add-file default-directory))
+
+  (add-hook 'dired-mode-hook #'+recentf-add-dired-directory-h))
 #+end_src
 
 ** Dired Icons
