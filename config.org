@@ -5011,6 +5011,7 @@ org clock to csv for example
 
 (use-package evmc
   :ensure nil
+  :defer t
   :load-path "~/Projects/evmc")
 
 (use-package lorg
@@ -5018,9 +5019,16 @@ org clock to csv for example
   :load-path "~/Projects/lorg"
   :defer t
   :commands (lorg-menu)
+  :init
+  (define-leader-keys "RET" 'lorg-menu)
   :config
-  (setq lorg-files '("~/Projects/code-zero/"))
-  (define-leader-keys "RET" 'lorg-menu))
+  (setq lorg-files '("~/Projects/code-zero")))
+
+(use-package vertico-private
+  :ensure nil
+  :defer t
+  :load-path "~/Projects/vertico-private")
+
 #+end_src
 
 * File Local Variables
