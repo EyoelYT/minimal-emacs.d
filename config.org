@@ -5001,6 +5001,53 @@ Modes derived from an element of this list are also excluded."
   :group 'mode-line)
 #+end_src
 
+* Music
+
+** Emms
+#+begin_src emacs-lisp :tangle post-init.el
+(use-package emms
+  :ensure t
+  :defer t
+  :init
+  (defun +emms-init ()
+    (interactive)
+    (when (not (+package-loaded-p 'emms))
+      (emms-all))
+    (call-interactively 'emms))
+  (define-leader-keys
+    "e e" '+emms-init
+    "e x" 'emms-pause
+    "e X" 'emms-stop
+    "e n" 'emms-next
+    "e p" 'emms-previous
+    "e b" 'emms-browser
+    "e a" 'emms-add-directory-tree)
+  :config
+
+  (emms-default-players)
+  ;; TODO: PR this upstream, gate on emacs version (introduced in 27.1, made default in 29.1)
+  ;; check via `current-time-list'
+  (with-eval-after-load 'emms-info
+    (when (not current-time-list)
+      (defun emms-time-less-p (t1 t2)
+        "Use native Emacs time comparison to support modern timestamp formats."
+        (time-less-p t1 t2))))
+
+  (when (eq system-type 'darwin)
+    (setq emms-source-file-default-directory "~/Music/"))
+
+  (with-eval-after-load 'emms-playlist-mode
+    (define-leader-keys
+      :keymaps 'emms-playlist-mode-map
+      "m r p" #'emms-toggle-repeat-playlist
+      "m r t" #'emms-toggle-repeat-track
+      "m i p" #'emms-insert-playlist
+      "m i f" #'emms-insert-file
+      "m p s" #'emms-playlist-save
+      "m s" #'emms-shuffle
+      "m S" #'emms-sort)))
+#+end_src
+
 * Proj Packages
 org clock to csv for example
 #+begin_src emacs-lisp
