@@ -3895,7 +3895,16 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
 #+begin_src emacs-lisp :tangle post-init.el
 (use-package treesit-fold
   :ensure t
-  :defer t)
+  :init
+  (global-treesit-fold-mode +1)
+  :config
+  (setq treesit-fold-line-count-show t
+        treesit-fold-line-count-format "… %d …")
+  (setf (alist-get 'odin-ts-mode treesit-fold-range-alist)
+        `((block . treesit-fold-range-seq)
+          (struct_declaration . ,(lambda (node offset) (treesit-fold-range-markers node offset "{" "}")))
+          (enum_declaration   . ,(lambda (node offset) (treesit-fold-range-markers node offset "{" "}")))
+          (comment . treesit-fold-range-seq))))
 #+end_src
 
 * Prog Modes
