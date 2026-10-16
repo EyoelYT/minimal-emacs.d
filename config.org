@@ -721,6 +721,12 @@ at the values with which this function was called."
 
 * Org Export
 #+begin_src emacs-lisp :tangle post-init.el
+(use-package ox
+  :ensure nil
+  :defer t
+  :config
+  (setq org-export-with-sub-superscripts nil))
+
 (use-package ox-pandoc
   :ensure t
   :if (executable-find "pandoc")
