@@ -806,18 +806,18 @@ at the values with which this function was called."
 (custom-set-faces
  '(mode-line-active ((t (:inherit (mode-line)))))
  '(mode-line-inactive ((t (:inherit (mode-line)))))
- '(font-lock-comment-face ((t (:slant unspecified)))) ; disable italic in comments
- `(line-number-current-line ((t (:background ,(face-attribute 'line-number :background)))))
  ;; '(font-lock-comment-face nil) ; enable italic in comments
+ '(font-lock-comment-face ((t (:slant unspecified)))) ; disable italic in comments
+ ;; '(italic nil) ; enable italic
  '(italic ((t (:slant unspecified)))) ; disable italic
  ;; '(bold nil) ; enable bold
  '(bold ((t (:weight unspecified)))) ; disable bold
  )
 
 (defun ey/set-custom-face-attributes-a (&rest _)
-  ;; set background of current line number to the same as the background of the default face
   (with-eval-after-load 'faces
-    (set-face-attribute 'line-number-current-line nil :background (face-attribute 'default :background))))
+    ;; Set background of current line number to the same as the background of the line-number
+    (set-face-attribute 'line-number-current-line nil :background (face-attribute 'line-number :background))))
 
 (advice-add 'consult-theme :after #'ey/set-custom-face-attributes-a)
 #+end_src
