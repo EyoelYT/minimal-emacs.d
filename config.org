@@ -3938,6 +3938,10 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
   :commands highlight-defined-mode
   :hook (emacs-lisp-mode . highlight-defined-mode))
 
+(use-package elisp-autofmt
+  :ensure t
+  :defer t)
+
 (use-package elisp-refs
   :ensure t
   :defer t
