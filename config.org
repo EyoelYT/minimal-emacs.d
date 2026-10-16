@@ -4114,11 +4114,8 @@ delete."
       (delete-char arg))))
 
 (use-package eshell-syntax-highlighting
-  :hook (eshell-mode . eshell-syntax-highlighting-mode)
-  ;; :init
-  ;; (add-hook 'eshell-syntax-highlighting-elisp-buffer-setup-hook
-  ;;           #'highlight-quoted-mode)
-  )
+  :ensure t
+  :defer t)
 #+end_src
 
 * Ghostel
