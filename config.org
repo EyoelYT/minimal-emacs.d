@@ -3911,6 +3911,33 @@ If INITIAL-INPUT is not nil, insert it into the minibuffer."
           (struct_declaration . ,(lambda (node offset) (treesit-fold-range-markers node offset "{" "}")))
           (enum_declaration   . ,(lambda (node offset) (treesit-fold-range-markers node offset "{" "}")))
           (comment . treesit-fold-range-seq))))
+
+(use-package hideshow
+  :ensure nil
+  :defer t
+  :init
+  (defun +hs-code-line-counts (ov)
+    (when (eq 'code (overlay-get ov 'hs))
+      (overlay-put ov 'display
+                   (propertize
+                    (format (concat (truncate-string-ellipsis) " %d "
+                                    (truncate-string-ellipsis))
+                            (count-lines (overlay-start ov)
+                                         (overlay-end ov)))
+                    'face (if (+package-loaded-p 'treesit-fold)
+                              'treesit-fold-replacement-face
+                            'hs-ellipsis)))))
+
+  (defun +hs-enable-no-ts-mode ()
+    "When treesit mode is not viable, use `hs-minor-mode'."
+    (when (not (and (treesit-available-p)
+                    (treesit-parser-list)
+                    (treesit-fold-usable-mode-p)))
+      (hs-minor-mode 1)))
+  (add-hook 'prog-mode-hook #'+hs-enable-no-ts-mode)
+  :config
+  (setq hs-display-lines-hidden t
+        hs-set-up-overlay #'+hs-code-line-counts))
 #+end_src
 
 * Prog Modes
