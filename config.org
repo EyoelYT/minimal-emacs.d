@@ -5091,6 +5091,25 @@ Modes derived from an element of this list are also excluded."
       "m S" #'emms-sort)))
 #+end_src
 
+* Mailing Lists
+
+** Gnus (ppr to evil collection)                                       :ppr:
+#+begin_src emacs-lisp :tangle post-init.el
+(use-package gnus
+  :ensure nil
+  :defer t
+  :init
+  (setq gnus-directory (concat user-emacs-directory "gnus/News/")
+        gnus-home-directory (concat user-emacs-directory "gnus/"))
+  :config
+  (setq gnus-thread-hide-subtree t
+        gnus-fetch-old-headers t
+        gnus-select-method '(nnnil "")
+        gnus-secondary-select-methods '((nntp "gwene" (nntp-address "news.gwene.org"))
+                                        (nnatom-address "https://xkcd.com")
+                                        (nntp "news.yhetil.org"))))
+#+end_src
+
 * Proj Packages
 org clock to csv for example
 #+begin_src emacs-lisp
