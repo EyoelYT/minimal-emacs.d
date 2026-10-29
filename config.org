@@ -1098,8 +1098,8 @@ Fixes doomemacs/core#3939: unsortable dired entries on Windows."
   (defun ey/magit-display-buffer-fn (buffer)
     "Display BUFFER in the selected window, except...
 - If opened from a commit window, it will open below it.
-- If a buffer's `major-mode' derives from `magit-diff-mode' or
-  `magit-process-mode', display it in another window."
+- If a buffer's `major-mode' derives from `magit-process-mode', display
+  it in another window."
     (let ((buffer-mode (buffer-local-value 'major-mode buffer)))
       (display-buffer
        buffer
@@ -1110,7 +1110,7 @@ Fixes doomemacs/core#3939: unsortable dired entries on Windows."
            `(display-buffer-below-selected
              . ((window-height . ,(truncate (* (window-height) size)))))))
         ((with-current-buffer buffer
-           (derived-mode-p (list 'magit-diff-mode 'magit-process-mode)))
+           (derived-mode-p (list 'magit-process-mode)))
          '(nil (inhibit-same-window . t)))
         ('(display-buffer-same-window)))))))
 
